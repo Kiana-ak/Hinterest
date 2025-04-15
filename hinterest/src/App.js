@@ -1,5 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
+import Flashcards from './components/Flashcards'; /* import from flash cards.js or css */
 
 function App() {
   return (
@@ -18,6 +19,10 @@ function App() {
           Learn React
         </a>
       </header>
+      {/* add the flash card componet here */}
+      <main>
+        <Flashcards />
+      </main>
     </div>
   );
 }
