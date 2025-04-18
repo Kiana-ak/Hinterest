@@ -1,10 +1,12 @@
 // Flashcard System JavaScript
 // This file implements a flashcard system that allows users to create and interact with flashcards
 
-// Flashcard class representing a single flashcard
+
 
 import React, { useState, useEffect } from 'react';
 import './Flashcards.css';
+
+import GeminiService from '../../services/GeminiService'; // Import the Gemini service
 
 const Flashcards = () => {
   // State for flashcards
@@ -26,6 +28,11 @@ const Flashcards = () => {
   
   // Filtered cards based on selected topic
   const [filteredCards, setFilteredCards] = useState([]);
+
+  // Generation state
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationCount, setGenerationCount] = useState(5);
+  const [generationError, setGenerationError] = useState('');
 
   // Load flashcards and topics from localStorage on component mount
   useEffect(() => {
@@ -84,6 +91,33 @@ const Flashcards = () => {
       // Reset just the term and definition but keep the selected topic
       setNewTerm('');
       setNewDefinition('');
+    }
+  };
+
+  // Generate flashcards using AI
+  const handleGenerateFlashcards = async (topic) => {
+    if (!topic || topic === '') {
+      setGenerationError('Please select a topic to generate flashcards');
+      return;
+    }
+    
+    setIsGenerating(true);
+    setGenerationError('');
+    
+    try {
+      const generatedCards = await GeminiService.generateFlashcards(topic, generationCount);
+      
+      // Add generated cards to existing cards
+      setFlashcards([...flashcards, ...generatedCards]);
+      
+      // Switch to study tab with selected topic
+      setSelectedTopic(topic);
+      setActiveTab('study');
+    } catch (error) {
+      setGenerationError('Failed to generate flashcards. Please try again.');
+      console.error('Generation error:', error);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -188,6 +222,12 @@ const Flashcards = () => {
         >
           Topics
         </button>
+        <button 
+          className={`tab ${activeTab === 'generate' ? 'active' : ''}`}
+          onClick={() => setActiveTab('generate')}
+        >
+          Generate
+        </button>
       </div>
       
       {activeTab === 'study' && (
@@ -253,7 +293,7 @@ const Flashcards = () => {
           ) : (
             <div className="empty-state">
               {topics.length > 0 && selectedTopic !== 'all' ? (
-                <p>No flash cards in this topic yet. Go to the "Manage Cards" tab to add some!</p>
+                <p>No flash cards in this topic yet. Go to the "Generate" tab to create some!</p>
               ) : (
                 <p>No flash cards yet. Go to the "Manage Cards" tab to add some!</p>
               )}
@@ -460,6 +500,16 @@ const Flashcards = () => {
                           >
                             Study
                           </button>
+                          <button
+                            className="study-btn"
+                            style={{ backgroundColor: '#FF9800' }}
+                            onClick={() => {
+                              setNewTopic(topic);
+                              setActiveTab('generate');
+                            }}
+                          >
+                            Generate Cards
+                          </button>
                           <button 
                             className="delete-btn"
                             onClick={() => handleDeleteTopic(topic)}
@@ -474,6 +524,116 @@ const Flashcards = () => {
               ) : (
                 <p className="empty-list">No topics added yet</p>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* New Generate tab */}
+      {activeTab === 'generate' && (
+        <div className="generate-tab">
+          <div className="card-form">
+            <h2>Generate Flashcards with AI</h2>
+            <form onSubmit={(e) => {
+              e.preventDefault();
+              handleGenerateFlashcards(newTopic);
+            }}>
+              <div className="form-group">
+                <label htmlFor="gen-topic">Select Topic:</label>
+                <div className="topic-input-group">
+                  <select
+                    id="gen-topic"
+                    value={newTopic}
+                    onChange={(e) => setNewTopic(e.target.value)}
+                    required
+                  >
+                    <option value="">Select a Topic</option>
+                    {topics.map((topic, index) => (
+                      <option key={index} value={topic}>
+                        {topic}
+                      </option>
+                    ))}
+                  </select>
+                  <button 
+                    type="button" 
+                    className="add-topic-btn"
+                    onClick={() => setIsAddingTopic(true)}
+                  >
+                    + New Topic
+                  </button>
+                </div>
+              </div>
+              
+              {isAddingTopic && (
+                <div className="form-group">
+                  <label htmlFor="new-topic-gen">New Topic Name:</label>
+                  <div className="topic-input-group">
+                    <input
+                      type="text"
+                      id="new-topic-gen"
+                      value={newTopicName}
+                      onChange={(e) => setNewTopicName(e.target.value)}
+                      required
+                    />
+                    <button 
+                      type="button"
+                      onClick={handleAddTopic}
+                    >
+                      Add
+                    </button>
+                    <button 
+                      type="button" 
+                      className="cancel-btn"
+                      onClick={() => setIsAddingTopic(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+              
+              <div className="form-group">
+                <label htmlFor="gen-count">Number of Flashcards:</label>
+                <input
+                  type="number"
+                  id="gen-count"
+                  value={generationCount}
+                  onChange={(e) => setGenerationCount(Math.max(1, Math.min(20, parseInt(e.target.value) || 1)))}
+                  min="1"
+                  max="20"
+                  required
+                />
+                <small>Generate between 1-20 flashcards at once</small>
+              </div>
+              
+              {generationError && (
+                <div className="error-message" style={{ color: 'red', marginBottom: '15px' }}>
+                  {generationError}
+                </div>
+              )}
+              
+              <div className="form-actions">
+                <button 
+                  type="submit"
+                  disabled={isGenerating || !newTopic}
+                >
+                  {isGenerating ? 'Generating...' : 'Generate Flashcards'}
+                </button>
+              </div>
+            </form>
+            
+            <div className="generation-info" style={{ marginTop: '20px' }}>
+              <h3>How It Works</h3>
+              <p>Our AI will generate high-quality flashcards for your selected topic. 
+              The generated cards will be automatically added to your collection and you'll 
+              be taken to the Study tab to review them.</p>
+              
+              <h4>Tips for Best Results:</h4>
+              <ul>
+                <li>Use specific topic names for more targeted flashcards</li>
+                <li>Generated cards can be edited later like any other flashcard</li>
+                <li>Start with 5-10 cards and generate more if needed</li>
+              </ul>
             </div>
           </div>
         </div>
