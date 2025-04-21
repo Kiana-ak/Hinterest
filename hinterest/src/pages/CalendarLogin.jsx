@@ -14,7 +14,7 @@ function CalendarLogin() {
     onError: () => {
       alert('Login failed');
     },
-    scope: 'https://www.googleapis.com/auth/calendar.readonly',
+    scope: 'https://www.googleapis.com/auth/calendar.events', // 🔁 Changed from .readonly
     flow: 'implicit',
   });
 
