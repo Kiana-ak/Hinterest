@@ -8,6 +8,12 @@ import FlashcardsPage from './pages/FlashcardsPage';
 import { useEffect } from 'react';
 
 function App() {
+  useEffect(() => {
+    if (!process.env.REACT_APP_GEMINI_API_KEY) {
+      console.error("Warning: Gemini API key not found. Flashcard generation will not work.");
+    }
+  }, []);
+
   return (
     <BrowserRouter>
       <Routes>
@@ -21,10 +27,5 @@ function App() {
     </BrowserRouter>
   );
 }
-useEffectseEffect(() => {
-  if (!process.env.REACT_APP_GEMINI_API_KEY) {
-    console.error("Warning: Gemini API key not found. Flashcard generation will not work.");
-  }
-}, []);
 
 export default App;
