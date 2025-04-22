@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 export default function HinterestContent() {
-  const [noteCreated, setNoteCreated] = useState(false);
+  const [noteCreated] = useState(false); // Removed unused setter
   const [currentNoteContent, setCurrentNoteContent] = useState('');
   const [showSummaryOptions, setShowSummaryOptions] = useState(false);
 

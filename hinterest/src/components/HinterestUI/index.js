@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import HinterestSidebar from './HinterestSidebar';
 import HinterestContent from './HinterestContent';
 import HinterestRightBar from './HinterestRightBar';

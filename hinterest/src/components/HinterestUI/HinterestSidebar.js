@@ -1,5 +1,4 @@
-import { useState } from 'react';
-
+// HinterestSidebar.js
 export default function HinterestSidebar() {
   return (
     <div className="w-32 bg-white border-r border-gray-300">

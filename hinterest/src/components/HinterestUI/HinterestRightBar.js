@@ -11,16 +11,12 @@ export default function HinterestRightBar() {
     <div className="w-40 bg-white border-l border-gray-300">
       <div className="p-4 border-b border-gray-300">Study plan</div>
       <div className="p-4 border-b border-gray-300">
-        <a 
-          href="#" 
-          className="block" 
-          onClick={(e) => {
-            e.preventDefault();
-            handleFlashcardsClick();
-          }}
+        <button 
+          className="block text-left w-full"
+          onClick={handleFlashcardsClick}
         >
           Flash cards
-        </a>
+        </button>
       </div>
       <div className="p-4 border-b border-gray-300">Notes</div>
       <div className="p-4 border-b border-gray-300">Videos</div>
