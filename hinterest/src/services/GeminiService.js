@@ -1,98 +1,116 @@
 // GeminiService.js - Service for generating flashcards with Gemini AI API
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-class GeminiService {
-  constructor() {
-    // Initialize the Google Generative AI with your API key
-    // You should store this in an environment variable in production
-    this.apiKey = process.env.REACT_APP_GEMINI_API_KEY;
-    this.genAI = new GoogleGenerativeAI(this.apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-  }
+// Initialize the Gemini API with your key
+// Note: In production, you should store this key in environment variables
+const API_KEY = "AIzaSyB5K8sEqjGMG1n3-gGT3FxyOUDVyXf3nNg"; // Replace with actual API key
+const genAI = new GoogleGenerativeAI(API_KEY);
 
-  /**
-   * Generate flashcards for a specific topic
-   * @param {string} topic - The topic to generate flashcards for
-   * @param {number} count - Number of flashcards to generate (default: 5)
-   * @returns {Promise<Array>} Array of generated flashcard objects
-   */
-  async generateFlashcards(topic, count = 5) {
+// Get the model
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+// Function to generate AI responses for summarizing lectures
+const summarizeLecture = async (lectureContent) => {
+  try {
+    const prompt = `Please summarize the following lecture: ${lectureContent}`;
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (error) {
+    console.error("Error summarizing lecture:", error);
+    return "Failed to summarize lecture. Please try again.";
+  }
+};
+
+// Function to generate notes from a lecture
+const generateNotes = async (lectureContent) => {
+  try {
+    const prompt = `Create organized study notes from this lecture: ${lectureContent}`;
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (error) {
+    console.error("Error generating notes:", error);
+    return "Failed to generate notes. Please try again.";
+  }
+};
+
+// Function to create flashcards from lecture content
+const createFlashcards = async (lectureContent) => {
+  try {
+    const prompt = `Create a set of flashcards with question on one side and answer on the other from this lecture content. Format as JSON with 'question' and 'answer' fields: ${lectureContent}`;
+    const result = await model.generateContent(prompt);
+    const flashcardsText = result.response.text();
+    
+    // Attempt to parse the response as JSON
     try {
-      // Create a prompt for the Gemini model
-      const prompt = `Generate ${count} flashcards about "${topic}". 
-      Each flashcard should have a term and its definition.
-      Format the output as a JSON array with objects containing "term", "definition", and "topic" fields.
-      The "topic" field should be set to "${topic}" for all cards.
-      Make the cards educational, accurate, and focused on key concepts.`;
-
-      // Generate content with Gemini
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      
-      // Parse the JSON response
-      // We need to handle potential formatting issues in the response
-      try {
-        // Find JSON content between brackets if there's text before/after the JSON
-        const jsonMatch = text.match(/\[[\s\S]*\]/);
-        const jsonString = jsonMatch ? jsonMatch[0] : text;
-        const parsedCards = JSON.parse(jsonString);
-        
-        // Validate the structure of each card
-        const validCards = parsedCards.filter(card => 
-          card.term && card.definition && typeof card.term === 'string' && typeof card.definition === 'string'
-        ).map(card => ({
-          term: card.term,
-          definition: card.definition,
-          topic: topic // Ensure the topic is correctly set
-        }));
-        
-        return validCards;
-      } catch (parseError) {
-        console.error('Error parsing Gemini response:', parseError);
-        throw new Error('Could not parse the AI response. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error generating flashcards with Gemini:', error);
-      throw error;
+      return JSON.parse(flashcardsText);
+    } catch (parseError) {
+      console.error("Error parsing flashcards JSON:", parseError);
+      return { error: "Failed to parse flashcards data" };
     }
+  } catch (error) {
+    console.error("Error creating flashcards:", error);
+    return { error: "Failed to create flashcards. Please try again." };
   }
+};
 
-  /**
-   * Get suggestions for flashcard topics
-   * @returns {Promise<Array>} Array of suggested topics
-   */
-  async getSuggestedTopics() {
+// Function to generate a quiz from lecture content
+const generateQuiz = async (lectureContent) => {
+  try {
+    const prompt = `Create a quiz with 5 multiple-choice questions based on this lecture. Format as JSON with 'question', 'options' (array), and 'correctAnswer' (index) fields: ${lectureContent}`;
+    const result = await model.generateContent(prompt);
+    const quizText = result.response.text();
+    
+    // Attempt to parse the response as JSON
     try {
-      const prompt = "Generate 10 popular educational topics for flashcards. Return as a JSON array of strings.";
-      
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      
-      // Parse the JSON response
-      try {
-        const jsonMatch = text.match(/\[[\s\S]*\]/);
-        const jsonString = jsonMatch ? jsonMatch[0] : text;
-        return JSON.parse(jsonString);
-      } catch (parseError) {
-        console.error('Error parsing topics response:', parseError);
-        return [
-          "Biology", "Chemistry", "Physics", "History", 
-          "Mathematics", "Geography", "Literature", "Programming",
-          "Foreign Languages", "Economics"
-        ];
-      }
-    } catch (error) {
-      console.error('Error fetching suggested topics:', error);
-      // Return fallback topics
-      return [
-        "Biology", "Chemistry", "Physics", "History", 
-        "Mathematics", "Geography", "Literature", "Programming",
-        "Foreign Languages", "Economics"
-      ];
+      return JSON.parse(quizText);
+    } catch (parseError) {
+      console.error("Error parsing quiz JSON:", parseError);
+      return { error: "Failed to parse quiz data" };
     }
+  } catch (error) {
+    console.error("Error generating quiz:", error);
+    return { error: "Failed to generate quiz. Please try again." };
   }
-}
+};
 
-export default new GeminiService();
+// Function to suggest related videos
+const suggestVideos = async (lectureContent) => {
+  try {
+    const prompt = `Based on this lecture content, suggest 3-5 topics for educational videos that would complement the material. Format as JSON with an array of objects containing 'title' and 'description' fields: ${lectureContent}`;
+    const result = await model.generateContent(prompt);
+    const suggestionsText = result.response.text();
+    
+    // Attempt to parse the response as JSON
+    try {
+      return JSON.parse(suggestionsText);
+    } catch (parseError) {
+      console.error("Error parsing video suggestions JSON:", parseError);
+      return { error: "Failed to parse video suggestions data" };
+    }
+  } catch (error) {
+    console.error("Error suggesting videos:", error);
+    return { error: "Failed to suggest videos. Please try again." };
+  }
+};
+
+// Function to answer student questions
+const answerQuestion = async (lectureContent, question) => {
+  try {
+    const prompt = `Based on this lecture content: "${lectureContent}", please answer the following question: "${question}"`;
+    const result = await model.generateContent(prompt);
+    return result.response.text();
+  } catch (error) {
+    console.error("Error answering question:", error);
+    return "I couldn't answer your question at this time. Please try rephrasing or ask something else.";
+  }
+};
+
+// Export all the functions
+export default {
+  summarizeLecture,
+  generateNotes,
+  createFlashcards,
+  generateQuiz,
+  suggestVideos,
+  answerQuestion
+};
