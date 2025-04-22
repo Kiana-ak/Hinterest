@@ -1,0 +1,57 @@
+* Add these styles to your existing Flashcards.css file */
+
+/* Generate tab styles */
+.generate-tab {
+  margin-top: 20px;
+}
+
+.generation-info {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.generation-info h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.generation-info h4 {
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.generation-info ul {
+  padding-left: 20px;
+}
+
+.generation-info li {
+  margin-bottom: 8px;
+}
+
+/* Additional button styles */
+.generate-btn {
+  background-color: #FF9800;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Loading indicator during generation */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

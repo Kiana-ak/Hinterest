@@ -5,6 +5,7 @@ import CalendarLogin from './pages/CalendarLogin';
 import CalendarPage from './pages/CalendarPage';
 import HinterestUI from './components/HinterestUI';
 import FlashcardsPage from './pages/FlashcardsPage';
+import { useEffect } from 'react';
 
 function App() {
   return (
@@ -20,5 +21,10 @@ function App() {
     </BrowserRouter>
   );
 }
+useEffectseEffect(() => {
+  if (!process.env.REACT_APP_GEMINI_API_KEY) {
+    console.error("Warning: Gemini API key not found. Flashcard generation will not work.");
+  }
+}, []);
 
 export default App;
