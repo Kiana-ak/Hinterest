@@ -1,3 +1,4 @@
+// GeminiService.js - Service for generating flashcards with Gemini AI API
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 class GeminiService {
