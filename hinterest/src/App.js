@@ -1,7 +1,7 @@
 import './App.css';
 import Flashcards from './components/Flashcards';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
+import React, {useEffect} from 'react';
 import Navbar from './components/Navbar';
 import LoginPage from './pages/LoginPage';
 import Home from './pages/Home';
