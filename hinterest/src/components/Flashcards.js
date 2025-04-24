@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import './Flashcards.css';
 
-import GeminiService from '../../services/GeminiService'; // Import the Gemini service
+import GeminiService from '../services/GeminiService'; // Import the Gemini service
 
 const Flashcards = () => {
   // State for flashcards

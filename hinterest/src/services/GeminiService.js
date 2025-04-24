@@ -1,98 +1,58 @@
 // GeminiService.js - Service for generating flashcards with Gemini AI API
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 class GeminiService {
   constructor() {
-    // Initialize the Google Generative AI with your API key
-    // You should store this in an environment variable in production
-    this.apiKey = process.env.REACT_APP_GEMINI_API_KEY;
-    this.genAI = new GoogleGenerativeAI(this.apiKey);
-    this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+    // You would need to replace this with your actual API key
+    this.API_KEY = 'AIzaSyB5K8sEqjGMG1n3-gGT3FxyOUDVyXf3nNg';
+    this.genAI = new GoogleGenerativeAI(this.API_KEY);
+    this.model = this.genAI.getGenerativeModel({ model: 'gemini-pro' });
   }
 
   /**
-   * Generate flashcards for a specific topic
+   * Generates flashcards for a given topic using Gemini AI
    * @param {string} topic - The topic to generate flashcards for
-   * @param {number} count - Number of flashcards to generate (default: 5)
-   * @returns {Promise<Array>} Array of generated flashcard objects
+   * @param {number} count - Number of flashcards to generate
+   * @returns {Promise<Array>} - Array of generated flashcard objects
    */
-  async generateFlashcards(topic, count = 5) {
+  static async generateFlashcards(topic, count) {
     try {
-      // Create a prompt for the Gemini model
-      const prompt = `Generate ${count} flashcards about "${topic}". 
-      Each flashcard should have a term and its definition.
-      Format the output as a JSON array with objects containing "term", "definition", and "topic" fields.
-      The "topic" field should be set to "${topic}" for all cards.
-      Make the cards educational, accurate, and focused on key concepts.`;
-
-      // Generate content with Gemini
-      const result = await this.model.generateContent(prompt);
+      const service = new GeminiService();
+      
+      const prompt = `Generate ${count} educational flashcards about "${topic}". 
+      Each flashcard should have a term and its definition. 
+      Format the response as a JSON array with objects containing "term" and "definition" properties.`;
+      
+      const result = await service.model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
       
       // Parse the JSON response
-      // We need to handle potential formatting issues in the response
+      // Note: This might need adjustment based on the actual response format
+      let cards;
       try {
-        // Find JSON content between brackets if there's text before/after the JSON
-        const jsonMatch = text.match(/\[[\s\S]*\]/);
-        const jsonString = jsonMatch ? jsonMatch[0] : text;
-        const parsedCards = JSON.parse(jsonString);
-        
-        // Validate the structure of each card
-        const validCards = parsedCards.filter(card => 
-          card.term && card.definition && typeof card.term === 'string' && typeof card.definition === 'string'
-        ).map(card => ({
-          term: card.term,
-          definition: card.definition,
-          topic: topic // Ensure the topic is correctly set
-        }));
-        
-        return validCards;
+        // Find JSON content in the response (handles cases where there might be extra text)
+        const jsonMatch = text.match(/\[.*\]/s);
+        if (jsonMatch) {
+          cards = JSON.parse(jsonMatch[0]);
+        } else {
+          throw new Error("Could not find JSON array in response");
+        }
       } catch (parseError) {
-        console.error('Error parsing Gemini response:', parseError);
-        throw new Error('Could not parse the AI response. Please try again.');
+        console.error("Error parsing JSON response:", parseError);
+        throw new Error("Failed to parse AI response");
       }
-    } catch (error) {
-      console.error('Error generating flashcards with Gemini:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get suggestions for flashcard topics
-   * @returns {Promise<Array>} Array of suggested topics
-   */
-  async getSuggestedTopics() {
-    try {
-      const prompt = "Generate 10 popular educational topics for flashcards. Return as a JSON array of strings.";
       
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      
-      // Parse the JSON response
-      try {
-        const jsonMatch = text.match(/\[[\s\S]*\]/);
-        const jsonString = jsonMatch ? jsonMatch[0] : text;
-        return JSON.parse(jsonString);
-      } catch (parseError) {
-        console.error('Error parsing topics response:', parseError);
-        return [
-          "Biology", "Chemistry", "Physics", "History", 
-          "Mathematics", "Geography", "Literature", "Programming",
-          "Foreign Languages", "Economics"
-        ];
-      }
+      // Add the topic to each card
+      return cards.map(card => ({
+        ...card,
+        topic: topic
+      }));
     } catch (error) {
-      console.error('Error fetching suggested topics:', error);
-      // Return fallback topics
-      return [
-        "Biology", "Chemistry", "Physics", "History", 
-        "Mathematics", "Geography", "Literature", "Programming",
-        "Foreign Languages", "Economics"
-      ];
+      console.error("Error generating flashcards:", error);
+      throw new Error("Failed to generate flashcards");
     }
   }
 }
 
-export default new GeminiService();
+export default GeminiService;
