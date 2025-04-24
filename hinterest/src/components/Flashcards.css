@@ -1,0 +1,417 @@
+
+/* styling of flash cards in css */
+flashcards-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Tabs styling */
+.tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.tab {
+  padding: 10px 20px;
+  background-color: #f5f5f5;
+  border: none;
+  cursor: pointer;
+  margin-right: 5px;
+  border-radius: 5px 5px 0 0;
+}
+
+.tab.active {
+  background-color: #4CAF50;
+  color: white;
+  font-weight: bold;
+}
+
+/* Card styling */
+.card {
+  width: 100%;
+  height: 200px;
+  margin-bottom: 20px;
+  perspective: 1000px;
+  cursor: pointer;
+}
+
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.card.flipped .card-inner {
+  transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  padding: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-front {
+  background-color: #fff;
+  color: #333;
+}
+
+.card-back {
+  background-color: #4CAF50;
+  color: white;
+  transform: rotateY(180deg);
+}
+
+.card-topic-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: #f0f0f0;
+  color: #666;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+.card-back .card-topic-tag {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.counter {
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 16px;
+  color: #666;
+}
+
+.navigation {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+/* Topic selector styling */
+.topic-selector {
+  margin-bottom: 20px;
+}
+
+.topic-selector label {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.topic-selector select {
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+  min-width: 200px;
+}
+
+/* Form styling */
+.card-form {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.topic-input-group {
+  display: flex;
+  gap: 10px;
+}
+
+.topic-input-group input,
+.topic-input-group select {
+  flex-grow: 1;
+}
+
+.topic-input-group button {
+  white-space: nowrap;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Card list styling */
+.card-list-filter {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.card-list-filter label {
+  margin-right: 10px;
+  white-space: nowrap;
+}
+
+.card-list-filter select {
+  flex-grow: 1;
+}
+
+.card-list {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.card-item {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-item:last-child {
+  border-bottom: none;
+}
+
+.card-details {
+  flex-grow: 1;
+  margin-right: 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-text {
+  font-weight: 500;
+}
+
+.card-topic {
+  font-size: 12px;
+  color: #666;
+  margin-top: 3px;
+  background-color: #f5f5f5;
+  padding: 2px 8px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.card-actions {
+  display: flex;
+}
+
+.card-actions button {
+  margin-left: 5px;
+}
+
+/* Topic management styling */
+.topics-management {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.add-topic-form {
+  margin-bottom: 20px;
+}
+
+.topics-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.topic-item {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.topic-item:last-child {
+  border-bottom: none;
+}
+
+.topic-details {
+  flex-grow: 1;
+}
+
+.topic-name {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.topic-count {
+  color: #666;
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.topic-actions {
+  display: flex;
+}
+
+.topic-actions button {
+  margin-left: 5px;
+}
+
+/* Button styling */
+.edit-btn {
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-btn {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.study-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-topic-btn {
+  background-color: #FF9800;
+  color: white;
+}
+
+.cancel-btn {
+  background-color: #ccc;
+  color: #333;
+}
+
+button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.empty-state, .empty-list {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+}
+
+
+/* this is  an added setion that allows styling to the flash cards with include intergeation with gemni */
+
+*/ Generate tab styles */
+.generate-tab {
+  margin-top: 20px;
+}
+
+.generation-info {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.generation-info h3 {
+  margin-top: 0;
+  color: #333;
+}
+
+.generation-info h4 {
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.generation-info ul {
+  padding-left: 20px;
+}
+
+.generation-info li {
+  margin-bottom: 8px;
+}
+
+/* Additional button styles */
+.generate-btn {
+  background-color: #FF9800;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Loading indicator during generation */
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid rgba(255,255,255,.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-right: 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
