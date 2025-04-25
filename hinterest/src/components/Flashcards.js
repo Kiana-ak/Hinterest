@@ -1,5 +1,6 @@
 // Flashcard System JavaScript
 // This file implements a flashcard system that allows users to create and interact with flashcards
+// some flash cards will loaded already for testing and demoing 
 
 
 
@@ -9,6 +10,35 @@ import './Flashcards.css';
 import GeminiService from '../services/GeminiService'; // Import the Gemini service
 
 const Flashcards = () => {
+  // Demo flashcards data
+  const demoFlashcards = [
+    { 
+      term: "React Hooks", 
+      definition: "Functions that let you use state and other React features without writing a class component.",
+      topic: "React"
+    },
+    { 
+      term: "useState", 
+      definition: "A Hook that lets you add React state to function components. Returns a stateful value and a function to update it.",
+      topic: "React"
+    },
+    { 
+      term: "useEffect", 
+      definition: "A Hook that lets you perform side effects in function components. It serves the same purpose as componentDidMount, componentDidUpdate, and componentWillUnmount in React classes.",
+      topic: "React"
+    },
+    { 
+      term: "JavaScript Closure", 
+      definition: "A function that has access to its own scope, the outer function's variables, and global variables even after the outer function has returned.",
+      topic: "JavaScript"
+    },
+    { 
+      term: "CSS Flexbox", 
+      definition: "A CSS layout module that allows responsive elements within a container to be automatically arranged depending on viewport size.",
+      topic: "CSS"
+    }
+  ];
+  
   // State for flashcards
   const [flashcards, setFlashcards] = useState([]);
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -43,6 +73,13 @@ const Flashcards = () => {
       
       // Extract unique topics from cards
       const uniqueTopics = [...new Set(parsedCards.map(card => card.topic))].filter(Boolean);
+      setTopics(uniqueTopics);
+    } else {
+      // If no saved cards, use the demo cards
+      setFlashcards(demoFlashcards);
+      
+      // Extract unique topics from demo cards
+      const uniqueTopics = [...new Set(demoFlashcards.map(card => card.topic))].filter(Boolean);
       setTopics(uniqueTopics);
     }
   }, []);
@@ -196,6 +233,16 @@ const Flashcards = () => {
       if (selectedTopic === topic) {
         setSelectedTopic('all');
       }
+    }
+  };
+
+  // Function to reset to demo flashcards
+  const resetToDemoFlashcards = () => {
+    if (window.confirm('Reset to demo flashcards? This will replace all your current flashcards.')) {
+      setFlashcards(demoFlashcards);
+      setSelectedTopic('all');
+      setCurrentCardIndex(0);
+      setIsFlipped(false);
     }
   };
 
@@ -455,6 +502,16 @@ const Flashcards = () => {
               </p>
             )}
           </div>
+          
+          {/* Reset to Demo Flashcards button */}
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <button 
+              onClick={resetToDemoFlashcards}
+              style={{ backgroundColor: '#9c27b0' }}
+            >
+              Reset to Demo Flashcards
+            </button>
+          </div>
         </div>
       )}
       
@@ -529,7 +586,7 @@ const Flashcards = () => {
         </div>
       )}
       
-      {/* New Generate tab */}
+      {/* Generate tab */}
       {activeTab === 'generate' && (
         <div className="generate-tab">
           <div className="card-form">
