@@ -7,6 +7,8 @@ import LoginPage from './pages/LoginPage';
 import Home from './pages/Home';
 import CalendarLogin from './pages/CalendarLogin';
 import CalendarPage from './pages/CalendarPage';
+import { ThemeProvider } from './ThemeContext'; // for theme change 
+
 
 function App() {
   return (
