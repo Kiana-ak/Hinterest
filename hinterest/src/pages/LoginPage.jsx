@@ -6,6 +6,7 @@ function Login() {
 
   const handleLogin = () => {
     // real auth logic later
+    sessionStorage.setItem('isLoggedIn', 'true')
     navigate('/home');
   };
 
