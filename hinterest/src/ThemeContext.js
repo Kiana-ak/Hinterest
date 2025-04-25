@@ -3,7 +3,12 @@ import React, { createContext, useState, useEffect } from 'react';
 // Create context with default values
 export const ThemeContext = createContext({
   darkMode: false,
-  toggleTheme: () => {}
+  toggleTheme: () => {},
+  colors: {
+    background: '#ffffff',
+    text: '#333333',
+    primary: '#0d6efd'
+  }
 });
 
 // Create provider component
@@ -20,6 +25,12 @@ export const ThemeProvider = ({ children }) => {
     setDarkMode(!darkMode);
   };
 
+  const colors = {
+    background: darkMode ? '#333' : '#fff',
+    text: darkMode ? '#fff' : '#333',
+    primary: darkMode ? '#61dafb' : '#282c34'
+  };
+
   // Update localStorage and apply class when theme changes
   useEffect(() => {
     localStorage.setItem('theme', darkMode ? 'dark' : 'light');
@@ -27,8 +38,17 @@ export const ThemeProvider = ({ children }) => {
   }, [darkMode]);
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleTheme }}>
+    <ThemeContext.Provider value={{ darkMode, toggleTheme, colors }}>
       {children}
     </ThemeContext.Provider>
   );
+};
+
+// Export custom hook for using theme
+export const useTheme = () => {
+  const context = React.useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
 };

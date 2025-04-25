@@ -1,14 +1,12 @@
-import { Link } from 'react-router-dom';
-import { useContext } from 'react';
-import { ThemeContext } from '../ThemeContext';
 
-function Navbar() {
-  const context = useContext(ThemeContext);
+import React from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext.js';
+import { useTheme } from '../ThemeContext';
 
-  //saftery check
-  const darkMode = context?.darkmode || false;
-  const toggleTheme = context?.toggleTheme || (() => console.log('Theme context not available'));
-
+export default function Navbar() {
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   return (
     <nav style={{ 
@@ -19,22 +17,13 @@ function Navbar() {
     }}>
       <div>
         <Link to="/home" style={{ marginRight: "1rem" }}>Home</Link>
-        <Link to="/calendar-login" style={{ marginRight: "1rem" }}>Calendar</Link>
-        <Link to="/">Logout</Link>
+        {currentUser && (
+          <>
+            <Link to="/calendar-login" style={{ marginRight: "1rem" }}>Calendar</Link>
+            <Link to="/flashcards" style={{ marginRight: "1rem" }}>Flashcards</Link>
+          </>
+        )}
       </div>
-      <button 
-        onClick={toggleTheme}
-        style={{
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          fontSize: "1.2rem"
-        }}
-      >
-        {darkMode ? "☀️" : "🌙"}
-      </button>
     </nav>
   );
 }
-
-export default Navbar;

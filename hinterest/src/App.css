@@ -97,3 +97,15 @@ body {
 .theme-toggle:focus {
   outline: none;
 }
+
+* {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+  text-decoration: none;
+}
+
+a:hover {
+  opacity: 0.8;
+}
