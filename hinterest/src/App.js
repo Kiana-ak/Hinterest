@@ -14,8 +14,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/calendar-login" element={<CalendarLogin />} />
         <Route path="/calendar" element={<CalendarPage />} />
-        
-
+        <Route path="/subject/:subjectName" element={<SubjectDashboard />} />
       </Routes>
     </BrowserRouter>
   );

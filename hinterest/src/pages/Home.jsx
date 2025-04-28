@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import Navbar from '../components/Navbar';
 import SubjectSelector from '../components/SubjectSelector';
-import SubjectContent from '../components/SubjectContent';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
   const [message, setMessage] = useState('Loading...');
+  const navigate = useNavigate();
 
   // Start with no subjects and no subject selected
   const [subjects, setSubjects] = useState([]);
@@ -19,6 +20,13 @@ function Home() {
         setMessage('Failed to connect to backend.');
       });
   }, []);
+
+  // Navigate to subject dashboard when a subject is selected
+  useEffect(() => {
+    if (selectedSubject) {
+      navigate(`/subject/${selectedSubject}`);
+    }
+  }, [selectedSubject, navigate]);
 
   return (
     <div>
@@ -48,9 +56,7 @@ function Home() {
           <h2>Welcome to Hinterest Dashboard</h2>
           <p>Backend says: {message}</p>
 
-          {selectedSubject ? (
-            <SubjectContent subject={selectedSubject} />
-          ) : (
+          {!selectedSubject && (
             <p style={{ color: 'gray' }}>Please select or add a subject to begin.</p>
           )}
         </div>
