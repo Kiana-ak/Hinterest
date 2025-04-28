@@ -3,6 +3,7 @@ import LoginPage from './pages/LoginPage';
 import Home from './pages/Home';
 import CalendarLogin from './pages/CalendarLogin';
 import CalendarPage from './pages/CalendarPage';
+import SubjectDashboard from './components/SubjectDashboard';
 
 
 function App() {
