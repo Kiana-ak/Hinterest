@@ -1,123 +1,281 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from './Navbar';
-import Chatbot from './Chatbot.jsx';
-import Flashcards from './Flashcards.jsx';
-import Notes from './Notes.jsx';
-import Quizzes from './Quizzes.jsx';
 
 function SubjectDashboard() {
-  // Use URL params for subject name
   const { subjectName } = useParams();
   const navigate = useNavigate();
-  
-  // Track current right sidebar selection
-  const [selectedContent, setSelectedContent] = useState('chatbot');
-  
-  // Reset to chatbot when subject changes
+  const [message, setMessage] = useState('');
+  const [chatHistory, setChatHistory] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [newSubject, setNewSubject] = useState('');
+
+  // Load subjects from localStorage when component mounts
   useEffect(() => {
-    setSelectedContent('chatbot');
-  }, [subjectName]);
-  
+    const savedSubjects = localStorage.getItem('subjects');
+    if (savedSubjects) {
+      try {
+        setSubjects(JSON.parse(savedSubjects));
+      } catch (error) {
+        console.error("Error parsing subjects:", error);
+        setSubjects([]);
+      }
+    }
+  }, []);
+
+  // Add new subject function
+  const handleAddSubject = (e) => {
+    e.preventDefault();
+    
+    if (newSubject.trim() === '') {
+      return;
+    }
+    
+    // Check if subject already exists
+    const subjectExists = subjects.some(
+      subject => subject.toLowerCase() === newSubject.trim().toLowerCase()
+    );
+    
+    if (subjectExists) {
+      alert('This subject already exists!');
+      return;
+    }
+    
+    const updatedSubjects = [...subjects, newSubject.trim()];
+    setSubjects(updatedSubjects);
+    localStorage.setItem('subjects', JSON.stringify(updatedSubjects));
+    setNewSubject('');
+  };
+
+  const handleSendMessage = () => {
+    if (message.trim() === '') return;
+    
+    // Add user message to chat history
+    const newChatHistory = [...chatHistory, { sender: 'user', text: message }];
+    
+    // Simulate AI response
+    setTimeout(() => {
+      const aiResponse = { sender: 'ai', text: `I'm the ${subjectName} chatbot. How can I help you with ${subjectName}?` };
+      setChatHistory([...newChatHistory, aiResponse]);
+    }, 500);
+    
+    setChatHistory(newChatHistory);
+    setMessage('');
+  };
+
   return (
-    <div>
-      <Navbar />
-      <div style={{ display: 'flex', height: 'calc(100vh - 60px)' }}>
-        {/* Left sidebar for subject list */}
-        <div style={{ width: '220px', background: '#eee', padding: '1rem' }}>
-          <h3>Menu</h3>
-          <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
-            <li><a href="/home">Home</a></li>
-            <li><a href="/calendar">Calendar</a></li>
-            <li><a href="/logout">Logout</a></li>
-          </ul>
-          <hr />
-          <h4>Subjects</h4>
-          <div style={{ padding: '0.5rem', background: '#ccc', borderRadius: '4px', marginBottom: '0.5rem' }}>
-            {subjectName}
-          </div>
+    <div style={{ display: 'flex', height: '100vh' }}>
+      {/* Sidebar */}
+      <div style={{ width: '250px', backgroundColor: '#f0f0f0', padding: '1rem', borderRight: '1px solid #ddd' }}>
+        <Link to="/home" style={{ display: 'block', marginBottom: '1rem' }}>Home</Link>
+        
+        <h3>Menu</h3>
+        <div style={{ marginBottom: '1rem' }}>
+          <Link to="/home" style={{ display: 'block', marginBottom: '0.5rem' }}>Home</Link>
+          <Link to="/calendar" style={{ display: 'block', marginBottom: '0.5rem' }}>Calendar</Link>
+          <Link to="/" style={{ display: 'block', marginBottom: '0.5rem' }}>Logout</Link>
         </div>
         
-        {/* Main content area */}
-        <div style={{ flex: 1, padding: '1rem' }}>
-          <h1>{subjectName} Dashboard</h1>
-          
-          {/* Center Display Logic */}
-          {selectedContent === 'chatbot' && <Chatbot subject={subjectName} />}
-          {selectedContent === 'flashcards' && <Flashcards subject={subjectName} />}
-          {selectedContent === 'notes' && <Notes subject={subjectName} />}
-          {selectedContent === 'quizzes' && <Quizzes subject={subjectName} />}
+        <h3>Subjects</h3>
+        <div style={{ marginBottom: '1rem' }}>
+          {subjects.map((subject, index) => (
+            <Link 
+              key={index}
+              to={`/subject/${encodeURIComponent(subject)}`}
+              style={{ 
+                display: 'block', 
+                padding: '0.5rem',
+                marginBottom: '0.25rem',
+                backgroundColor: subject === subjectName ? '#ddd' : 'transparent',
+                borderRadius: '4px',
+                textDecoration: 'none',
+                color: 'inherit'
+              }}
+            >
+              {subject}
+            </Link>
+          ))}
         </div>
         
-        {/* Right sidebar */}
-        <div style={{ width: '200px', background: '#f0f0f0', padding: '1rem', borderLeft: '1px solid #ddd' }}>
+        {/* Always visible subject input form */}
+        <form onSubmit={handleAddSubject} style={{ marginBottom: '1rem' }}>
+          <input
+            type="text"
+            value={newSubject}
+            onChange={(e) => setNewSubject(e.target.value)}
+            placeholder="Add new subject"
+            style={{
+              width: '100%',
+              padding: '0.5rem',
+              marginBottom: '0.5rem',
+              borderRadius: '4px',
+              border: '1px solid #ccc'
+            }}
+          />
+          <button
+            type="submit"
+            style={{
+              width: '100%',
+              padding: '0.5rem',
+              backgroundColor: '#4285f4',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Add Subject
+          </button>
+        </form>
+      </div>
+      
+      {/* Main content */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1rem' }}>
+        <h2>{subjectName} Dashboard</h2>
+        
+        {/* Chat area */}
+        <div style={{ 
+          flex: 1, 
+          border: '1px solid #ddd', 
+          borderRadius: '8px', 
+          padding: '1rem',
+          marginBottom: '1rem',
+          overflowY: 'auto'
+        }}>
+          {chatHistory.length === 0 ? (
+            <p>Welcome to the {subjectName} chatbot! How can I help you today?</p>
+          ) : (
+            chatHistory.map((msg, index) => (
+              <div 
+                key={index}
+                style={{
+                  marginBottom: '0.5rem',
+                  textAlign: msg.sender === 'user' ? 'right' : 'left'
+                }}
+              >
+                <span style={{
+                  display: 'inline-block',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '1rem',
+                  backgroundColor: msg.sender === 'user' ? '#4285f4' : '#f0f0f0',
+                  color: msg.sender === 'user' ? 'white' : 'black'
+                }}>
+                  {msg.text}
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+        
+        {/* Message input */}
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            placeholder="Type your question..."
+            style={{
+              flex: 1,
+              padding: '0.5rem',
+              borderRadius: '4px',
+              border: '1px solid #ccc'
+            }}
+            onKeyPress={(e) => {
+              if (e.key === 'Enter') handleSendMessage();
+            }}
+          />
+          <button
+            onClick={handleSendMessage}
+            style={{
+              padding: '0.5rem 1rem',
+              backgroundColor: '#4285f4',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Send
+          </button>
+        </div>
+        
+        {/* Tools section */}
+        <div style={{ marginTop: '2rem' }}>
           <h3>Tools</h3>
-          <ul style={{ listStyleType: 'none', padding: 0 }}>
-            <li>
-              <button 
-                onClick={() => setSelectedContent('chatbot')}
-                style={{ 
-                  background: selectedContent === 'chatbot' ? '#ddd' : 'transparent',
-                  border: 'none',
-                  padding: '0.5rem',
-                  width: '100%',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  marginBottom: '0.5rem'
-                }}
-              >
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', 
+            gap: '1rem' 
+          }}>
+            <Link 
+              to={`/subject/${encodeURIComponent(subjectName)}/chatbot`}
+              style={{ 
+                textDecoration: 'none',
+                color: 'inherit'
+              }}
+            >
+              <div style={{ 
+                padding: '1rem', 
+                backgroundColor: '#f9f9f9', 
+                borderRadius: '8px',
+                textAlign: 'center',
+                cursor: 'pointer'
+              }}>
                 Chatbot
-              </button>
-            </li>
-            <li>
-              <button 
-                onClick={() => setSelectedContent('flashcards')}
-                style={{ 
-                  background: selectedContent === 'flashcards' ? '#ddd' : 'transparent',
-                  border: 'none',
-                  padding: '0.5rem',
-                  width: '100%',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  marginBottom: '0.5rem'
-                }}
-              >
+              </div>
+            </Link>
+            <Link 
+              to={`/subject/${encodeURIComponent(subjectName)}/flashcards`}
+              style={{ 
+                textDecoration: 'none',
+                color: 'inherit'
+              }}
+            >
+              <div style={{ 
+                padding: '1rem', 
+                backgroundColor: '#f9f9f9', 
+                borderRadius: '8px',
+                textAlign: 'center',
+                cursor: 'pointer'
+              }}>
                 Flashcards
-              </button>
-            </li>
-            <li>
-              <button 
-                onClick={() => setSelectedContent('notes')}
-                style={{ 
-                  background: selectedContent === 'notes' ? '#ddd' : 'transparent',
-                  border: 'none',
-                  padding: '0.5rem',
-                  width: '100%',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  marginBottom: '0.5rem'
-                }}
-              >
+              </div>
+            </Link>
+            <Link 
+              to={`/subject/${encodeURIComponent(subjectName)}/notes`}
+              style={{ 
+                textDecoration: 'none',
+                color: 'inherit'
+              }}
+            >
+              <div style={{ 
+                padding: '1rem', 
+                backgroundColor: '#f9f9f9', 
+                borderRadius: '8px',
+                textAlign: 'center',
+                cursor: 'pointer'
+              }}>
                 Notes
-              </button>
-            </li>
-            <li>
-              <button 
-                onClick={() => setSelectedContent('quizzes')}
-                style={{ 
-                  background: selectedContent === 'quizzes' ? '#ddd' : 'transparent',
-                  border: 'none',
-                  padding: '0.5rem',
-                  width: '100%',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  marginBottom: '0.5rem'
-                }}
-              >
+              </div>
+            </Link>
+            <Link 
+              to={`/subject/${encodeURIComponent(subjectName)}/quizzes`}
+              style={{ 
+                textDecoration: 'none',
+                color: 'inherit'
+              }}
+            >
+              <div style={{ 
+                padding: '1rem', 
+                backgroundColor: '#f9f9f9', 
+                borderRadius: '8px',
+                textAlign: 'center',
+                cursor: 'pointer'
+              }}>
                 Quizzes
-              </button>
-            </li>
-          </ul>
+              </div>
+            </Link>
+          </div>
         </div>
       </div>
     </div>
