@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Navbar from '../components/Navbar';
+import { Link } from 'react-router-dom';
 import SubjectSelector from '../components/SubjectSelector';
 import SubjectContent from '../components/SubjectContent';
 
@@ -22,16 +22,15 @@ function Home() {
 
   return (
     <div>
-      <Navbar />
 
       <div style={{ display: 'flex', height: 'calc(100vh - 60px)' }}>
         {/* Sidebar */}
         <div style={{ width: '220px', background: '#eee', padding: '1rem' }}>
           <h3>Menu</h3>
           <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
-            <li><a href="/home">Home</a></li>
-            <li><a href="/calendar">Calendar</a></li>
-            <li><a href="/logout">Logout</a></li>
+          <li><Link to="/home">Home</Link></li>
+          <li><Link to="/calendar-login">Calendar</Link></li>
+          <li><Link to="/">Logout</Link></li>
           </ul>
           <hr />
 
