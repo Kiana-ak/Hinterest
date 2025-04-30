@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { getGeminiResponse } from '../services/GeminiService';
 import Navbar from './Navbar';
 
 function Chatbot() {
@@ -8,6 +9,7 @@ function Chatbot() {
   const [chatHistory, setChatHistory] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [newSubject, setNewSubject] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Load subjects from localStorage
   useEffect(() => {
@@ -46,20 +48,41 @@ function Chatbot() {
     setNewSubject('');
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (message.trim() === '') return;
     
     // Add user message to chat history
-    const newChatHistory = [...chatHistory, { sender: 'user', text: message }];
-    
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponse = { sender: 'ai', text: `I'm the ${subjectName} chatbot. How can I help you with ${subjectName}?` };
-      setChatHistory([...newChatHistory, aiResponse]);
-    }, 500);
-    
+    const userMessage = { sender: 'user', text: message };
+    const newChatHistory = [...chatHistory, userMessage];
     setChatHistory(newChatHistory);
+    
+    // Clear input and show loading state
     setMessage('');
+    setLoading(true);
+    
+    try {
+      // Get response from Gemini API
+      const prompt = subjectName 
+        ? `Question about ${subjectName}: ${message}` 
+        : message;
+      
+      const geminiResponse = await getGeminiResponse(prompt);
+      
+      // Add AI response to chat history
+      setChatHistory([...newChatHistory, { 
+        sender: 'ai', 
+        text: geminiResponse 
+      }]);
+    } catch (error) {
+      console.error("Error getting Gemini response:", error);
+      // Add error message to chat
+      setChatHistory([...newChatHistory, { 
+        sender: 'ai', 
+        text: "Sorry, I couldn't get a response from Gemini. Please try again." 
+      }]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -130,7 +153,7 @@ function Chatbot() {
       
       {/* Main content */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '1rem' }}>
-        <h2>{subjectName} Chatbot</h2>
+        <h2>{subjectName ? `${subjectName} Chatbot` : 'AI Assistant'}</h2>
         
         {/* Chat area */}
         <div style={{ 
@@ -142,7 +165,7 @@ function Chatbot() {
           overflowY: 'auto'
         }}>
           {chatHistory.length === 0 ? (
-            <p>Welcome to the {subjectName} chatbot! How can I help you today?</p>
+            <p>Welcome to the {subjectName ? `${subjectName} chatbot` : 'AI assistant'}! Ask me anything and I'll help you.</p>
           ) : (
             chatHistory.map((msg, index) => (
               <div 
@@ -157,12 +180,28 @@ function Chatbot() {
                   padding: '0.5rem 1rem',
                   borderRadius: '1rem',
                   backgroundColor: msg.sender === 'user' ? '#4285f4' : '#f0f0f0',
-                  color: msg.sender === 'user' ? 'white' : 'black'
+                  color: msg.sender === 'user' ? 'white' : 'black',
+                  maxWidth: '80%',
+                  wordBreak: 'break-word',
+                  whiteSpace: 'pre-wrap'
                 }}>
                   {msg.text}
                 </span>
               </div>
             ))
+          )}
+          {loading && (
+            <div style={{ textAlign: 'left', marginTop: '0.5rem' }}>
+              <span style={{
+                display: 'inline-block',
+                padding: '0.5rem 1rem',
+                borderRadius: '1rem',
+                backgroundColor: '#f0f0f0',
+                color: 'black'
+              }}>
+                Thinking...
+              </span>
+            </div>
           )}
         </div>
         
@@ -182,6 +221,7 @@ function Chatbot() {
             onKeyPress={(e) => {
               if (e.key === 'Enter') handleSendMessage();
             }}
+            disabled={loading}
           />
           <button
             onClick={handleSendMessage}
@@ -191,10 +231,12 @@ function Chatbot() {
               color: 'white',
               border: 'none',
               borderRadius: '4px',
-              cursor: 'pointer'
+              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.7 : 1
             }}
+            disabled={loading}
           >
-            Send
+            {loading ? 'Sending...' : 'Send'}
           </button>
         </div>
       </div>
