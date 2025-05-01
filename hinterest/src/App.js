@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import CalendarLogin from './pages/CalendarLogin';
 import CalendarPage from './pages/CalendarPage';
 import NotePage from './components/NotePage';
+import FlashcardsPage from './pages/FlashcardsPage';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/calendar-login" element={<CalendarLogin />} />
           <Route path="/calendar" element={<CalendarPage />} />
           <Route path="/notes" element={<NotePage />} />
+          <Route path="/flashcards" element={<FlashcardsPage />} />
         </Routes>
       </div>
     </Router>
