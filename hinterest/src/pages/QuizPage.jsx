@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 
 const QuizPage = () => {
-  const [quizzes, setQuizzes] = useState({});  // Changed to object to store multiple quizzes
+  const [quizzes, setQuizzes] = useState({});
   const [currentQuizName, setCurrentQuizName] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [currentSubject, setCurrentSubject] = useState('');
@@ -14,28 +14,68 @@ const QuizPage = () => {
   const [score, setScore] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState([]);
   const [quizComplete, setQuizComplete] = useState(false);
-  const [summary, setSummary] = useState({
-    total: 0,
-    correct: 0
-  });
+  const [summary, setSummary] = useState({ total: 0, correct: 0 });
   const [selectedQuizKey, setSelectedQuizKey] = useState('');
+  const [flashcards, setFlashcards] = useState({});
+  const [notes, setNotes] = useState({});
+  const [showFlashcardForm, setShowFlashcardForm] = useState(false);
+  const [showNoteForm, setShowNoteForm] = useState(false);
+  const [currentFlashcard, setCurrentFlashcard] = useState({ front: '', back: '' });
+  const [currentNote, setCurrentNote] = useState('');
 
-  // Load quizzes from localStorage when component mounts or subject changes
+  // Add these two functions to handle quiz interactions
+  const handleAnswerSelect = (questionIndex, optionIndex) => {
+    const newSelectedAnswers = [...selectedAnswers];
+    newSelectedAnswers[questionIndex] = optionIndex;
+    setSelectedAnswers(newSelectedAnswers);
+  };
+
+  const checkAnswers = () => {
+    if (!selectedQuizKey || !quizzes[selectedQuizKey]) return;
+    
+    let correct = 0;
+    const total = quizzes[selectedQuizKey].length;
+    
+    quizzes[selectedQuizKey].forEach((question, index) => {
+      if (question.correctAnswers.includes(selectedAnswers[index])) {
+        correct++;
+      }
+    });
+
+    setSummary({ total, correct });
+    setQuizComplete(true);
+    setShowResults(true);
+  };
+
   useEffect(() => {
     if (currentSubject) {
       const savedQuizzes = localStorage.getItem(`quizzes_${currentSubject}`);
-      if (savedQuizzes) {
-        setQuizzes(JSON.parse(savedQuizzes));
-      } else {
-        setQuizzes({});
-      }
+      setQuizzes(savedQuizzes ? JSON.parse(savedQuizzes) : {});
+
+      const savedFlashcards = localStorage.getItem(`flashcards_${currentSubject}`);
+      if (savedFlashcards) setFlashcards(JSON.parse(savedFlashcards));
+
+      const savedNotes = localStorage.getItem(`notes_${currentSubject}`);
+      if (savedNotes) setNotes(JSON.parse(savedNotes));
+
+      localStorage.setItem('currentSubject', currentSubject);
+      localStorage.setItem('lastActive', Date.now().toString());
     }
   }, [currentSubject]);
 
-  // Save quizzes to localStorage
+  useEffect(() => {
+    const lastSubject = localStorage.getItem('currentSubject');
+    const lastActive = localStorage.getItem('lastActive');
+    if (lastSubject && lastActive) {
+      const hoursSinceLastActive = (Date.now() - parseInt(lastActive)) / (1000 * 60 * 60);
+      if (hoursSinceLastActive < 24) setCurrentSubject(lastSubject);
+    }
+  }, []);
+
   const saveQuizzes = (newQuizzes) => {
     localStorage.setItem(`quizzes_${currentSubject}`, JSON.stringify(newQuizzes));
     setQuizzes(newQuizzes);
+    localStorage.setItem(`lastModified_${currentSubject}`, Date.now().toString());
   };
 
   const handleAddOption = () => {
@@ -57,16 +97,6 @@ const QuizPage = () => {
     setOptions(newOptions);
   };
 
-  const toggleCorrectAnswer = (index) => {
-    setCorrectAnswers(prev => {
-      if (prev.includes(index)) {
-        return prev.filter(i => i !== index);
-      } else {
-        return [...prev, index];
-      }
-    });
-  };
-
   const handleSubmitQuiz = (e) => {
     e.preventDefault();
     if (currentQuizName && question.trim() && options.every(opt => opt.trim()) && correctAnswers.length > 0) {
@@ -85,141 +115,44 @@ const QuizPage = () => {
       };
 
       saveQuizzes(updatedQuizzes);
-      // Reset only the question form, keep the quiz name
       setQuestion('');
       setOptions(['', '']);
       setCorrectAnswers([]);
-      // Don't clear currentQuizName here
       setShowForm(false);
     }
   };
 
-  const handleDeleteQuiz = (quizId) => {
-    if (selectedQuizKey) {
-      const updatedQuizList = quizzes[selectedQuizKey].filter(quiz => quiz.id !== quizId);
-      const updatedQuizzes = {
-        ...quizzes,
-        [selectedQuizKey]: updatedQuizList
+  const handleSubmitFlashcard = (e) => {
+    e.preventDefault();
+    if (currentFlashcard.front.trim() && currentFlashcard.back.trim()) {
+      const newFlashcards = {
+        ...flashcards,
+        [currentSubject]: [...(flashcards[currentSubject] || []), {
+          id: Date.now(),
+          ...currentFlashcard
+        }]
       };
-      
-      if (updatedQuizList.length === 0) {
-        delete updatedQuizzes[selectedQuizKey];
-      }
-      
-      saveQuizzes(updatedQuizzes);
-      if (updatedQuizList.length === 0) {
-        setSelectedQuizKey('');
-      }
+      setFlashcards(newFlashcards);
+      localStorage.setItem(`flashcards_${currentSubject}`, JSON.stringify(newFlashcards));
+      setCurrentFlashcard({ front: '', back: '' });
+      setShowFlashcardForm(false);
     }
   };
 
-  const handleAnswerSelect = (optionIndex) => {
-    if (!showResults) {
-      const newSelectedAnswers = selectedAnswers.includes(optionIndex)
-        ? selectedAnswers.filter(i => i !== optionIndex)
-        : [...selectedAnswers, optionIndex];
-      setSelectedAnswers(newSelectedAnswers);
-    }
-  };
-
-  const checkAnswers = () => {
-    const currentQuizItem = quizzes[selectedQuizKey][currentQuiz];
-    const isCorrect = selectedAnswers.length === currentQuizItem.correctAnswers.length &&
-      selectedAnswers.every(answer => currentQuizItem.correctAnswers.includes(answer));
-    
-    if (isCorrect) {
-      setScore(score + 1);
-    }
-    setShowResults(true);
-
-    // Check if this is the last question
-    if (currentQuiz === quizzes[selectedQuizKey].length - 1) {
-      setQuizComplete(true);
-      setSummary({
-        total: quizzes[selectedQuizKey].length,
-        correct: score + (isCorrect ? 1 : 0)
-      });
-    }
-  };
-
-  const nextQuiz = () => {
-    if (currentQuiz < quizzes[selectedQuizKey].length - 1) {
-      setCurrentQuiz(currentQuiz + 1);
-      setSelectedAnswers([]);
-      setShowResults(false);
-    }
-  };
-
-  const resetQuiz = () => {
-    setCurrentQuiz(0);
-    setScore(0);
-    setShowResults(false);
-    setQuizComplete(false);
-    setSelectedAnswers([]);
-  };
-
-  const handleGeminiResponse = (response) => {
-    // Assuming response is a string containing the chat response
-    const lines = response.split('\n');
-    const questions = [];
-    let currentQuestion = null;
-
-    lines.forEach(line => {
-      // Check if line starts with a number followed by dot/parenthesis (like "1." or "1)")
-      if (/^\d+[\.\)]/.test(line.trim())) {
-        if (currentQuestion) {
-          questions.push(currentQuestion);
-        }
-        currentQuestion = {
-          question: line.replace(/^\d+[\.\)]/, '').trim(),
-          options: [],
-          correctAnswers: []
-        };
-      } else if (currentQuestion && line.trim().startsWith('-')) {
-        // Assume lines starting with dash are options
-        const option = line.trim().substring(1).trim();
-        if (option.toLowerCase().includes('(correct)')) {
-          // If option contains (correct), mark it as correct answer
-          currentQuestion.correctAnswers.push(currentQuestion.options.length);
-          currentQuestion.options.push(option.replace('(correct)', '').trim());
-        } else {
-          currentQuestion.options.push(option);
-        }
-      }
-    });
-
-    // Add the last question if exists
-    if (currentQuestion) {
-      questions.push(currentQuestion);
-    }
-
-    // Create a new quiz from the parsed questions
-    if (questions.length > 0) {
-      const quizName = `Quiz from Gemini ${new Date().toLocaleString()}`;
-      const formattedQuestions = questions.map(q => ({
-        id: Date.now() + Math.random(), // Ensure unique ID
-        question: q.question,
-        options: q.options,
-        correctAnswers: q.correctAnswers
-      }));
-
-      const updatedQuizzes = {
-        ...quizzes,
-        [quizName]: formattedQuestions
+  const handleSubmitNote = (e) => {
+    e.preventDefault();
+    if (currentNote.trim()) {
+      const newNotes = {
+        ...notes,
+        [currentSubject]: [...(notes[currentSubject] || []), {
+          id: Date.now(),
+          content: currentNote
+        }]
       };
-
-      // Save the updated quizzes
-      saveQuizzes(updatedQuizzes);
-      
-      // Select the newly created quiz
-      setSelectedQuizKey(quizName);
-      
-      // Reset quiz state
-      setCurrentQuiz(0);
-      setScore(0);
-      setShowResults(false);
-      setQuizComplete(false);
-      setSelectedAnswers([]);
+      setNotes(newNotes);
+      localStorage.setItem(`notes_${currentSubject}`, JSON.stringify(newNotes));
+      setCurrentNote('');
+      setShowNoteForm(false);
     }
   };
 
@@ -227,307 +160,172 @@ const QuizPage = () => {
     <div>
       <Navbar />
       <div style={{ padding: '2rem' }}>
-        <h2>Quiz</h2>
-
+        <h2>Study Materials</h2>
+        
         {/* Subject Selection */}
-        <div style={{ marginBottom: '20px' }}>
-          <input
-            type="text"
-            value={currentSubject}
-            onChange={(e) => setCurrentSubject(e.target.value)}
-            placeholder="Enter subject name"
-            style={{ padding: '8px', marginRight: '10px' }}
-          />
-        </div>
-
-        {/* Quiz Selection */}
-        {currentSubject && (
-          <div style={{ marginBottom: '20px' }}>
-            <select
-              value={selectedQuizKey}
-              onChange={(e) => {
-                setSelectedQuizKey(e.target.value);
-                setCurrentQuiz(0);
-                setScore(0);
-                setShowResults(false);
-                setQuizComplete(false);
-                setSelectedAnswers([]);
-              }}
-              style={{ padding: '8px', marginRight: '10px' }}
-            >
-              <option value="">Select a Quiz</option>
-              {Object.keys(quizzes).map(quizName => (
-                <option key={quizName} value={quizName}>
-                  {quizName}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        <input
+          type="text"
+          value={currentSubject}
+          onChange={(e) => setCurrentSubject(e.target.value)}
+          placeholder="Enter subject name"
+          style={{ marginBottom: '1rem', padding: '0.5rem' }}
+        />
 
         {/* Control Buttons */}
-        <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            style={{
-              padding: '8px 16px',
-              backgroundColor: '#28a745',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px'
-            }}
-          >
-            {showForm ? 'Cancel' : 'Add Quiz'}
+        <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+          <button onClick={() => setShowForm(!showForm)}>
+            {showForm ? 'Cancel Quiz' : 'Add Quiz'}
+          </button>
+          <button onClick={() => setShowFlashcardForm(!showFlashcardForm)}>
+            {showFlashcardForm ? 'Cancel Flashcard' : 'Add Flashcard'}
+          </button>
+          <button onClick={() => setShowNoteForm(!showNoteForm)}>
+            {showNoteForm ? 'Cancel Note' : 'Add Note'}
           </button>
         </div>
 
         {/* Quiz Form */}
         {showForm && (
-          <form onSubmit={handleSubmitQuiz} style={{ marginBottom: '20px' }}>
-            <div style={{ marginBottom: '10px' }}>
-              <input
-                type="text"
-                value={currentQuizName}
-                onChange={(e) => setCurrentQuizName(e.target.value)}
-                placeholder="Enter quiz name"
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  marginBottom: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd'
-                }}
-              />
-            </div>
-            <div style={{ marginBottom: '10px' }}>
-              <input
-                type="text"
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Enter question"
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  marginBottom: '8px',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd'
-                }}
-              />
-            </div>
-            
+          <form onSubmit={handleSubmitQuiz}>
+            <input
+              type="text"
+              value={currentQuizName}
+              onChange={(e) => setCurrentQuizName(e.target.value)}
+              placeholder="Quiz Name"
+            />
+            <input
+              type="text"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Question"
+            />
             {options.map((option, index) => (
-              <div key={index} style={{ marginBottom: '10px', display: 'flex', alignItems: 'center' }}>
+              <div key={index}>
                 <input
                   type="text"
                   value={option}
                   onChange={(e) => handleOptionChange(index, e.target.value)}
                   placeholder={`Option ${index + 1}`}
-                  style={{
-                    flex: 1,
-                    padding: '8px',
-                    marginRight: '10px',
-                    borderRadius: '4px',
-                    border: '1px solid #ddd'
-                  }}
                 />
                 <input
                   type="checkbox"
                   checked={correctAnswers.includes(index)}
-                  onChange={() => toggleCorrectAnswer(index)}
-                  style={{ marginRight: '5px' }}
+                  onChange={() => setCorrectAnswers(prev => 
+                    prev.includes(index) 
+                      ? prev.filter(i => i !== index)
+                      : [...prev, index]
+                  )}
                 />
-                <label>Correct</label>
               </div>
             ))}
-
-            <div style={{ marginBottom: '10px', display: 'flex', gap: '10px' }}>
-              <button
-                type="button"
-                onClick={handleAddOption}
-                disabled={options.length >= 4}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: '#007bff',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: options.length >= 4 ? 'not-allowed' : 'pointer',
-                  opacity: options.length >= 4 ? 0.6 : 1
-                }}
-              >
-                Add Option
-              </button>
-              <button
-                type="button"
-                onClick={handleRemoveOption}
-                disabled={options.length <= 2}
-                style={{
-                  padding: '8px 16px',
-                  backgroundColor: '#dc3545',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '4px',
-                  cursor: options.length <= 2 ? 'not-allowed' : 'pointer',
-                  opacity: options.length <= 2 ? 0.6 : 1
-                }}
-              >
-                Remove Option
-              </button>
-            </div>
-
-            <button
-              type="submit"
-              style={{
-                padding: '8px 16px',
-                backgroundColor: '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
-            >
-              Save Quiz
-            </button>
+            <button type="button" onClick={handleAddOption}>Add Option</button>
+            <button type="button" onClick={handleRemoveOption}>Remove Option</button>
+            <button type="submit">Save Quiz</button>
           </form>
         )}
 
-        {/* Quiz Display */}
-        {!showForm && selectedQuizKey && quizzes[selectedQuizKey]?.length > 0 && (
-          <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-            {/* Quiz Management */}
-            {!showResults && (
-              <div style={{ marginBottom: '20px' }}>
-                <button
-                  onClick={() => handleDeleteQuiz(quizzes[selectedQuizKey][currentQuiz].id)}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#dc3545',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    marginRight: '10px'
-                  }}
-                >
-                  Delete Current Question
-                </button>
-                <button
-                  onClick={resetQuiz}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#6c757d',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Reset Quiz
-                </button>
+        {/* Flashcard Form */}
+        {showFlashcardForm && (
+          <form onSubmit={handleSubmitFlashcard}>
+            <input
+              type="text"
+              value={currentFlashcard.front}
+              onChange={(e) => setCurrentFlashcard({...currentFlashcard, front: e.target.value})}
+              placeholder="Front of flashcard"
+            />
+            <textarea
+              value={currentFlashcard.back}
+              onChange={(e) => setCurrentFlashcard({...currentFlashcard, back: e.target.value})}
+              placeholder="Back of flashcard"
+            />
+            <button type="submit">Save Flashcard</button>
+          </form>
+        )}
+
+        {/* Note Form */}
+        {showNoteForm && (
+          <form onSubmit={handleSubmitNote}>
+            <textarea
+              value={currentNote}
+              onChange={(e) => setCurrentNote(e.target.value)}
+              placeholder="Enter your note"
+            />
+            <button type="submit">Save Note</button>
+          </form>
+        )}
+
+        {/* Display Section */}
+        {currentSubject && (
+          <div>
+            {/* Quiz Display */}
+            {quizzes[currentSubject]?.length > 0 && (
+              <div>
+                <h3>Quizzes</h3>
+                <select onChange={(e) => setSelectedQuizKey(e.target.value)}>
+                  <option value="">Select a quiz</option>
+                  {Object.keys(quizzes).map(key => (
+                    <option key={key} value={key}>{key}</option>
+                  ))}
+                </select>
+                {selectedQuizKey && !quizComplete && (
+                  <div>
+                    <h4>{quizzes[selectedQuizKey][currentQuiz].question}</h4>
+                    {quizzes[selectedQuizKey][currentQuiz].options.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleAnswerSelect(index)}
+                        style={{
+                          backgroundColor: selectedAnswers.includes(index) ? '#ddd' : '#fff'
+                        }}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                    <button onClick={checkAnswers}>Submit Answer</button>
+                  </div>
+                )}
+                {showResults && (
+                  <div>
+                    <p>Score: {score}</p>
+                    <button onClick={() => {
+                      setShowResults(false);
+                      setSelectedAnswers([]);
+                      if (currentQuiz < quizzes[selectedQuizKey].length - 1) {
+                        setCurrentQuiz(currentQuiz + 1);
+                      } else {
+                        setQuizComplete(true);
+                        setSummary({ total: quizzes[selectedQuizKey].length, correct: score });
+                      }
+                    }}>Next Question</button>
+                  </div>
+                )}
               </div>
             )}
 
-            <div style={{ 
-              border: '2px solid black',
-              padding: '20px',
-              marginBottom: '20px',
-              backgroundColor: 'white'
-            }}>
-              <h3 style={{ marginBottom: '15px' }}>{quizzes[selectedQuizKey][currentQuiz].question}</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                {quizzes[selectedQuizKey][currentQuiz].options.map((option, index) => (
-                  <div
-                    key={index}
-                    onClick={() => handleAnswerSelect(index)}
-                    style={{
-                      padding: '10px',
-                      border: '1px solid #ddd',
-                      borderRadius: '4px',
-                      cursor: 'pointer',
-                      backgroundColor: showResults
-                        ? quizzes[selectedQuizKey][currentQuiz].correctAnswers.includes(index)
-                          ? '#d4edda'
-                          : selectedAnswers.includes(index)
-                            ? '#f8d7da'
-                            : 'white'
-                        : selectedAnswers.includes(index)
-                          ? '#e2e6ea'
-                          : 'white'
-                    }}
-                  >
-                    {option}
+            {/* Flashcards Display */}
+            {flashcards[currentSubject]?.length > 0 && (
+              <div>
+                <h3>Flashcards</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+                  {flashcards[currentSubject].map(card => (
+                    <div key={card.id} style={{ border: '1px solid #ddd', padding: '1rem' }}>
+                      <p><strong>Front:</strong> {card.front}</p>
+                      <p><strong>Back:</strong> {card.back}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Notes Display */}
+            {notes[currentSubject]?.length > 0 && (
+              <div>
+                <h3>Notes</h3>
+                {notes[currentSubject].map(note => (
+                  <div key={note.id} style={{ border: '1px solid #ddd', padding: '1rem', marginBottom: '1rem' }}>
+                    {note.content}
                   </div>
                 ))}
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>Question {currentQuiz + 1} of {quizzes[selectedQuizKey].length}</span>
-              {!showResults ? (
-                <button
-                  onClick={checkAnswers}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Check Answer
-                </button>
-              ) : (
-                <button
-                  onClick={nextQuiz}
-                  disabled={currentQuiz === quizzes[selectedQuizKey].length - 1}
-                  style={{
-                    padding: '8px 16px',
-                    backgroundColor: '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: currentQuiz === quizzes[selectedQuizKey].length - 1 ? 'not-allowed' : 'pointer',
-                    opacity: currentQuiz === quizzes[selectedQuizKey].length - 1 ? 0.6 : 1
-                  }}
-                >
-                  Next Question
-                </button>
-              )}
-            </div>
-
-            {/* Quiz Summary */}
-            {(showResults || quizComplete) && (
-              <div style={{ 
-                marginTop: '20px', 
-                padding: '20px', 
-                backgroundColor: '#f8f9fa',
-                border: '2px solid black',
-                borderRadius: '4px'
-              }}>
-                <h3 style={{ marginBottom: '10px' }}>Quiz Progress</h3>
-                <p>Current Score: {score} / {currentQuiz + 1}</p>
-                {quizComplete && (
-                  <>
-                    <h4 style={{ marginTop: '15px', marginBottom: '10px' }}>Final Results</h4>
-                    <p>You got {summary.correct} out of {summary.total} questions correct!</p>
-                    <p>Final Score: {Math.round((summary.correct / summary.total) * 100)}%</p>
-                    <button
-                      onClick={resetQuiz}
-                      style={{
-                        marginTop: '15px',
-                        padding: '8px 16px',
-                        backgroundColor: '#28a745',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Try Again
-                    </button>
-                  </>
-                )}
               </div>
             )}
           </div>
