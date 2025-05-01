@@ -6,9 +6,26 @@ import SubjectContent from '../components/SubjectContent';
 function Home() {
   const [message, setMessage] = useState('Loading...');
 
-  // Start with no subjects and no subject selected
-  const [subjects, setSubjects] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState('');
+  // Load subjects from localStorage on initial render
+  const [subjects, setSubjects] = useState(() => {
+    const savedSubjects = localStorage.getItem('subjects');
+    return savedSubjects ? JSON.parse(savedSubjects) : [];
+  });
+  
+  const [selectedSubject, setSelectedSubject] = useState(() => {
+    const savedSubject = localStorage.getItem('selectedSubject');
+    return savedSubject || '';
+  });
+
+  // Save subjects to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('subjects', JSON.stringify(subjects));
+  }, [subjects]);
+
+  // Save selected subject to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('selectedSubject', selectedSubject);
+  }, [selectedSubject]);
 
   useEffect(() => {
     fetch('http://localhost:5000/api/test')
