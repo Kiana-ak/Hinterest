@@ -158,6 +158,71 @@ const QuizPage = () => {
     setSelectedAnswers([]);
   };
 
+  const handleGeminiResponse = (response) => {
+    // Assuming response is a string containing the chat response
+    const lines = response.split('\n');
+    const questions = [];
+    let currentQuestion = null;
+
+    lines.forEach(line => {
+      // Check if line starts with a number followed by dot/parenthesis (like "1." or "1)")
+      if (/^\d+[\.\)]/.test(line.trim())) {
+        if (currentQuestion) {
+          questions.push(currentQuestion);
+        }
+        currentQuestion = {
+          question: line.replace(/^\d+[\.\)]/, '').trim(),
+          options: [],
+          correctAnswers: []
+        };
+      } else if (currentQuestion && line.trim().startsWith('-')) {
+        // Assume lines starting with dash are options
+        const option = line.trim().substring(1).trim();
+        if (option.toLowerCase().includes('(correct)')) {
+          // If option contains (correct), mark it as correct answer
+          currentQuestion.correctAnswers.push(currentQuestion.options.length);
+          currentQuestion.options.push(option.replace('(correct)', '').trim());
+        } else {
+          currentQuestion.options.push(option);
+        }
+      }
+    });
+
+    // Add the last question if exists
+    if (currentQuestion) {
+      questions.push(currentQuestion);
+    }
+
+    // Create a new quiz from the parsed questions
+    if (questions.length > 0) {
+      const quizName = `Quiz from Gemini ${new Date().toLocaleString()}`;
+      const formattedQuestions = questions.map(q => ({
+        id: Date.now() + Math.random(), // Ensure unique ID
+        question: q.question,
+        options: q.options,
+        correctAnswers: q.correctAnswers
+      }));
+
+      const updatedQuizzes = {
+        ...quizzes,
+        [quizName]: formattedQuestions
+      };
+
+      // Save the updated quizzes
+      saveQuizzes(updatedQuizzes);
+      
+      // Select the newly created quiz
+      setSelectedQuizKey(quizName);
+      
+      // Reset quiz state
+      setCurrentQuiz(0);
+      setScore(0);
+      setShowResults(false);
+      setQuizComplete(false);
+      setSelectedAnswers([]);
+    }
+  };
+
   return (
     <div>
       <Navbar />
