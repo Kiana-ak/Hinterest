@@ -29,10 +29,24 @@ const SubjectContent = ({ subject }) => {
             backgroundColor: '#28a745',
             color: 'white',
             textDecoration: 'none',
-            borderRadius: '4px'
+            borderRadius: '4px',
+            marginRight: '10px'
           }}
         >
           View Flashcards
+        </Link>
+        <Link 
+          to="/quiz" 
+          style={{
+            display: 'inline-block',
+            padding: '8px 16px',
+            backgroundColor: '#dc3545',
+            color: 'white',
+            textDecoration: 'none',
+            borderRadius: '4px'
+          }}
+        >
+          Take Quiz
         </Link>
       </div>
 
