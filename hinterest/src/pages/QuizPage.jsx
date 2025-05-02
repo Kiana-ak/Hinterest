@@ -49,15 +49,31 @@ const QuizPage = () => {
 
   useEffect(() => {
     if (currentSubject) {
+      // Load quizzes
       const savedQuizzes = localStorage.getItem(`quizzes_${currentSubject}`);
-      setQuizzes(savedQuizzes ? JSON.parse(savedQuizzes) : {});
+      if (savedQuizzes) {
+        setQuizzes(JSON.parse(savedQuizzes));
+      } else {
+        setQuizzes({});
+      }
 
-      const savedFlashcards = localStorage.getItem(`flashcards_${currentSubject}`);
-      if (savedFlashcards) setFlashcards(JSON.parse(savedFlashcards));
+      // Load flashcards - get from the subjects list
+      const savedSubjects = localStorage.getItem('subjects');
+      const subjects = savedSubjects ? JSON.parse(savedSubjects) : [];
+      
+      if (subjects.includes(currentSubject)) {
+        const savedFlashcards = localStorage.getItem(`flashcards_${currentSubject}`);
+        if (savedFlashcards) {
+          setFlashcards(JSON.parse(savedFlashcards));
+        }
 
-      const savedNotes = localStorage.getItem(`notes_${currentSubject}`);
-      if (savedNotes) setNotes(JSON.parse(savedNotes));
+        const savedNotes = localStorage.getItem(`notes_${currentSubject}`);
+        if (savedNotes) {
+          setNotes(JSON.parse(savedNotes));
+        }
+      }
 
+      // Save current subject to localStorage
       localStorage.setItem('currentSubject', currentSubject);
       localStorage.setItem('lastActive', Date.now().toString());
     }
@@ -125,19 +141,55 @@ const QuizPage = () => {
   const handleSubmitFlashcard = (e) => {
     e.preventDefault();
     if (currentFlashcard.front.trim() && currentFlashcard.back.trim()) {
-      const newFlashcards = {
-        ...flashcards,
-        [currentSubject]: [...(flashcards[currentSubject] || []), {
-          id: Date.now(),
-          ...currentFlashcard
-        }]
+      const newFlashcard = {
+        id: Date.now(),
+        front: currentFlashcard.front,
+        back: currentFlashcard.back
       };
-      setFlashcards(newFlashcards);
-      localStorage.setItem(`flashcards_${currentSubject}`, JSON.stringify(newFlashcards));
+
+      const updatedFlashcards = {
+        ...flashcards,
+        [currentSubject]: [...(flashcards[currentSubject] || []), newFlashcard]
+      };
+
+      // Store in sessionStorage instead of localStorage
+      sessionStorage.setItem(`flashcards_${currentSubject}`, JSON.stringify(updatedFlashcards));
+      setFlashcards(updatedFlashcards);
       setCurrentFlashcard({ front: '', back: '' });
       setShowFlashcardForm(false);
     }
   };
+
+  useEffect(() => {
+    if (currentSubject) {
+      // Load quizzes from localStorage (permanent storage)
+      const savedQuizzes = localStorage.getItem(`quizzes_${currentSubject}`);
+      if (savedQuizzes) {
+        setQuizzes(JSON.parse(savedQuizzes));
+      } else {
+        setQuizzes({});
+      }
+
+      // Load flashcards from sessionStorage (session-only storage)
+      const savedFlashcards = sessionStorage.getItem(`flashcards_${currentSubject}`);
+      if (savedFlashcards) {
+        setFlashcards(JSON.parse(savedFlashcards));
+      } else {
+        setFlashcards({});
+      }
+
+      // Load notes from localStorage (permanent storage)
+      const savedNotes = localStorage.getItem(`notes_${currentSubject}`);
+      if (savedNotes) {
+        setNotes(JSON.parse(savedNotes));
+      } else {
+        setNotes({});
+      }
+
+      localStorage.setItem('currentSubject', currentSubject);
+      localStorage.setItem('lastActive', Date.now().toString());
+    }
+  }, [currentSubject]);
 
   const handleSubmitNote = (e) => {
     e.preventDefault();
@@ -303,7 +355,7 @@ const QuizPage = () => {
             )}
 
             {/* Flashcards Display */}
-            {flashcards[currentSubject]?.length > 0 && (
+            {currentSubject && flashcards[currentSubject] && flashcards[currentSubject].length > 0 && (
               <div>
                 <h3>Flashcards</h3>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>

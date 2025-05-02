@@ -11,10 +11,23 @@ const FlashcardsPage = () => {
   const [viewMode, setViewMode] = useState('single'); // 'single' or 'multiple'
   const [currentIndex, setCurrentIndex] = useState(0); // Add this line
 
-  // Load flashcards from localStorage when component mounts or subject changes
+  // Load flashcards and subject when component mounts
+  useEffect(() => {
+    const savedSubject = sessionStorage.getItem('currentFlashcardSubject');
+    if (savedSubject) {
+      setCurrentSubject(savedSubject);
+      const savedCards = sessionStorage.getItem(`flashcards_${savedSubject}`);
+      if (savedCards) {
+        setFlashcards(JSON.parse(savedCards));
+      }
+    }
+  }, []);
+
+  // Update sessionStorage when subject changes
   useEffect(() => {
     if (currentSubject) {
-      const savedCards = localStorage.getItem(`flashcards_${currentSubject}`);
+      sessionStorage.setItem('currentFlashcardSubject', currentSubject);
+      const savedCards = sessionStorage.getItem(`flashcards_${currentSubject}`);
       if (savedCards) {
         setFlashcards(JSON.parse(savedCards));
       } else {
@@ -23,10 +36,12 @@ const FlashcardsPage = () => {
     }
   }, [currentSubject]);
 
-  // Save flashcards to localStorage
+  // Save flashcards to sessionStorage
   const saveFlashcards = (cards) => {
-    localStorage.setItem(`flashcards_${currentSubject}`, JSON.stringify(cards));
-    setFlashcards(cards);
+    if (currentSubject) {
+      sessionStorage.setItem(`flashcards_${currentSubject}`, JSON.stringify(cards));
+      setFlashcards(cards);
+    }
   };
 
   const handleAddCard = (e) => {
