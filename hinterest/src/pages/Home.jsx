@@ -4,7 +4,7 @@ import SubjectSelector from '../components/SubjectSelector';
 import SubjectContent from '../components/SubjectContent';
 import Chatbot from '../components/Chatbot';
 import Flashcards from '../components/Flashcards';
-import Notes from '../components/Notecard'; // Use your actual Notes component name
+import Notes from './NotesPage'; // Use your actual Notes component name
 import Quizzes from './QuizzesPage'; // Fixed: Updated import path to same directory
 
 function Home() {
