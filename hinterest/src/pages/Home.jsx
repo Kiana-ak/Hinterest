@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import SubjectSelector from '../components/SubjectSelector';
 import SubjectContent from '../components/SubjectContent';
 import Chatbot from '../components/Chatbot';
-import Flashcards from '../components/Flashcards';
+import Flashcards from './FlashcardsPage';
 import Notes from './NotesPage';
 import Quizzes from './QuizzesPage';
 
