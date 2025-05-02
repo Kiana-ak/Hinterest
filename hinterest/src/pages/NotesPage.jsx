@@ -1,53 +1,42 @@
 import React, { useState, useEffect } from 'react';
 
-const NotesPage = () => {
+const NotesPage = ({ subject }) => {
   const [notes, setNotes] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [currentNote, setCurrentNote] = useState('');
-  const [currentSubject, setCurrentSubject] = useState('');
+  const [currentTitle, setCurrentTitle] = useState('');
 
-  // Load notes and subject when component mounts
+  // Load notes when component mounts or subject changes
   useEffect(() => {
-    const savedSubject = sessionStorage.getItem('currentNoteSubject');
-    if (savedSubject) {
-      setCurrentSubject(savedSubject);
-      const savedNotes = sessionStorage.getItem(`notes_${savedSubject}`);
-      if (savedNotes) {
-        setNotes(JSON.parse(savedNotes));
-      }
-    }
-  }, []);
-
-  // Update sessionStorage when subject changes
-  useEffect(() => {
-    if (currentSubject) {
-      sessionStorage.setItem('currentNoteSubject', currentSubject);
-      const savedNotes = sessionStorage.getItem(`notes_${currentSubject}`);
+    if (subject) {
+      const savedNotes = localStorage.getItem(`notes_${subject}`);
       if (savedNotes) {
         setNotes(JSON.parse(savedNotes));
       } else {
         setNotes([]);
       }
     }
-  }, [currentSubject]);
+  }, [subject]);
 
-  // Save notes to sessionStorage
+  // Save notes to localStorage
   const saveNotes = (newNotes) => {
-    if (currentSubject) {
-      sessionStorage.setItem(`notes_${currentSubject}`, JSON.stringify(newNotes));
+    if (subject) {
+      localStorage.setItem(`notes_${subject}`, JSON.stringify(newNotes));
       setNotes(newNotes);
     }
   };
 
   const handleAddNote = (e) => {
     e.preventDefault();
-    if (currentNote.trim()) {
+    if (currentNote.trim() && currentTitle.trim()) {
       const newNote = {
         id: Date.now(),
+        title: currentTitle,
         content: currentNote
       };
       saveNotes([...notes, newNote]);
       setCurrentNote('');
+      setCurrentTitle('');
       setShowForm(false);
     }
   };
@@ -59,21 +48,9 @@ const NotesPage = () => {
 
   return (
     <div>
-      {/* Remove the Navbar component */}
       <div style={{ padding: '2rem' }}>
-        <h2>Notes</h2>
+        <h2>Notes for {subject}</h2>
         
-        {/* Subject Selection */}
-        <div style={{ marginBottom: '20px' }}>
-          <input
-            type="text"
-            value={currentSubject}
-            onChange={(e) => setCurrentSubject(e.target.value)}
-            placeholder="Enter subject name"
-            style={{ padding: '8px', marginRight: '10px' }}
-          />
-        </div>
-
         {/* Control Button */}
         <button
           onClick={() => setShowForm(!showForm)}
@@ -92,6 +69,19 @@ const NotesPage = () => {
         {/* Note Form */}
         {showForm && (
           <form onSubmit={handleAddNote} style={{ marginBottom: '20px' }}>
+            <input
+              type="text"
+              value={currentTitle}
+              onChange={(e) => setCurrentTitle(e.target.value)}
+              placeholder="Enter note title"
+              style={{
+                width: '100%',
+                padding: '8px',
+                marginBottom: '8px',
+                borderRadius: '4px',
+                border: '1px solid #ddd'
+              }}
+            />
             <textarea
               value={currentNote}
               onChange={(e) => setCurrentNote(e.target.value)}
@@ -133,6 +123,7 @@ const NotesPage = () => {
                 position: 'relative'
               }}
             >
+              <h3 style={{ margin: '0 0 10px 0' }}>{note.title}</h3>
               <p style={{ margin: 0 }}>{note.content}</p>
               <button
                 onClick={() => handleDeleteNote(note.id)}
