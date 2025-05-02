@@ -5,7 +5,7 @@ import SubjectContent from '../components/SubjectContent';
 import Chatbot from '../components/Chatbot';
 import Flashcards from '../components/Flashcards';
 import Notes from '../components/Notecard'; // Use your actual Notes component name
-import Quizzes from '../components/Quizcard'; // Use your actual Quizzes component name
+import Quizzes from './QuizzesPage'; // Fixed: Updated import path to same directory
 
 function Home() {
   const [message, setMessage] = useState('Loading...');
