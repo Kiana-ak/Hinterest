@@ -36,7 +36,7 @@ const SubjectContent = ({ subject }) => {
           View Flashcards
         </Link>
         <Link 
-          to="/quiz" 
+          to="/quizzes" 
           style={{
             display: 'inline-block',
             padding: '8px 16px',
