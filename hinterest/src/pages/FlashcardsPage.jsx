@@ -1,44 +1,30 @@
 import React, { useState, useEffect } from 'react';
 
-const FlashcardsPage = () => {
+const FlashcardsPage = ({ subject }) => {
   const [flashcards, setFlashcards] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
   const [showAnswer, setShowAnswer] = useState({});
-  const [currentSubject, setCurrentSubject] = useState('');
-  const [viewMode, setViewMode] = useState('single'); // 'single' or 'multiple'
-  const [currentIndex, setCurrentIndex] = useState(0); // Add this line
+  const [viewMode, setViewMode] = useState('single');
+  const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Load flashcards and subject when component mounts
+  // Load flashcards when component mounts or subject changes
   useEffect(() => {
-    const savedSubject = sessionStorage.getItem('currentFlashcardSubject');
-    if (savedSubject) {
-      setCurrentSubject(savedSubject);
-      const savedCards = sessionStorage.getItem(`flashcards_${savedSubject}`);
-      if (savedCards) {
-        setFlashcards(JSON.parse(savedCards));
-      }
-    }
-  }, []);
-
-  // Update sessionStorage when subject changes
-  useEffect(() => {
-    if (currentSubject) {
-      sessionStorage.setItem('currentFlashcardSubject', currentSubject);
-      const savedCards = sessionStorage.getItem(`flashcards_${currentSubject}`);
+    if (subject) {
+      const savedCards = localStorage.getItem(`flashcards_${subject}`);
       if (savedCards) {
         setFlashcards(JSON.parse(savedCards));
       } else {
         setFlashcards([]);
       }
     }
-  }, [currentSubject]);
+  }, [subject]);
 
-  // Save flashcards to sessionStorage
+  // Save flashcards to localStorage
   const saveFlashcards = (cards) => {
-    if (currentSubject) {
-      sessionStorage.setItem(`flashcards_${currentSubject}`, JSON.stringify(cards));
+    if (subject) {
+      localStorage.setItem(`flashcards_${subject}`, JSON.stringify(cards));
       setFlashcards(cards);
     }
   };
@@ -94,21 +80,11 @@ const FlashcardsPage = () => {
 
   return (
     <div>
-      {/* Remove the Navbar component */}
       <div style={{ padding: '2rem' }}>
-        <h2>Flashcards</h2>
+        <h2>Flashcards for {subject}</h2>
         
-        {/* Subject Selection */}
-        <div style={{ marginBottom: '20px' }}>
-          <input
-            type="text"
-            value={currentSubject}
-            onChange={(e) => setCurrentSubject(e.target.value)}
-            placeholder="Enter subject name"
-            style={{ padding: '8px', marginRight: '10px' }}
-          />
-        </div>
-
+        {/* Remove Subject Selection since we're using prop */}
+        
         {/* View Mode Toggle and Control Buttons */}
         <div style={{ marginBottom: '20px', display: 'flex', gap: '10px' }}>
           <button
