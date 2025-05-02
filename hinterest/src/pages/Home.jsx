@@ -4,19 +4,31 @@ import SubjectSelector from '../components/SubjectSelector';
 import SubjectContent from '../components/SubjectContent';
 import Chatbot from '../components/Chatbot';
 import Flashcards from '../components/Flashcards';
-import Notes from './NotesPage'; // Use your actual Notes component name
-import Quizzes from './QuizzesPage'; // Fixed: Updated import path to same directory
+import Notes from './NotesPage';
+import Quizzes from './QuizzesPage';
 
 function Home() {
+  // Initialize states with localStorage values
   const [message, setMessage] = useState('Loading...');
+  const [subjects, setSubjects] = useState(() => {
+    const savedSubjects = localStorage.getItem('subjects');
+    return savedSubjects ? JSON.parse(savedSubjects) : [];
+  });
+  
+  const [selectedSubject, setSelectedSubject] = useState(() => {
+    const savedSubject = localStorage.getItem('selectedSubject');
+    return savedSubject || '';
+  });
 
-  // Start with no subjects and no subject selected
-  const [subjects, setSubjects] = useState([]);
-  const [selectedSubject, setSelectedSubject] = useState('');
-  const [selectedTool, setSelectedTool] = useState('chatbot');
+  const [selectedTool, setSelectedTool] = useState(() => {
+    const savedTool = localStorage.getItem('selectedTool');
+    return savedTool || 'chatbot';
+  });
+
   const [showLeftSidebar, setShowLeftSidebar] = useState(true);
   const [showRightSidebar, setShowRightSidebar] = useState(true);
 
+  // API connection check
   useEffect(() => {
     fetch('http://localhost:5000/api/test')
       .then((res) => res.text())
@@ -26,6 +38,19 @@ function Home() {
         setMessage('Failed to connect to backend.');
       });
   }, []);
+
+  // Persist data to localStorage
+  useEffect(() => {
+    localStorage.setItem('subjects', JSON.stringify(subjects));
+  }, [subjects]);
+
+  useEffect(() => {
+    localStorage.setItem('selectedSubject', selectedSubject);
+  }, [selectedSubject]);
+
+  useEffect(() => {
+    localStorage.setItem('selectedTool', selectedTool);
+  }, [selectedTool]);
 
   return (
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)' }}>
