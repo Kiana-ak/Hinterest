@@ -14,13 +14,30 @@ const SubjectSelector = ({ selectedSubject, setSelectedSubject, subjects, setSub
 
     // Clear the input field after adding
     setNewSubject('');
-  };
+    };
+
+    const searchSubject = () => {
+      const trimmed = newSubject.trim().toLowerCase();
+      const match = subjects.find(sub => sub.toLowerCase().includes(trimmed));
+      if (match) setSelectedSubject(match);
+      else alert('No subjects found');
+    };
 
   // Handle "Enter" key to add subject
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      addSubject();
+      const trimmed = newSubject.trim();
+      const match = subjects.find(sub => sub.toLowerCase() === trimmed.toLowerCase());
+  
+      if (match) {
+        setSelectedSubject(match);
+      } else if (trimmed !== '') {
+        setSubjects([...subjects, trimmed]);
+        setSelectedSubject(trimmed);
+      }
+  
+      setNewSubject('');
     }
   };
 
@@ -40,6 +57,7 @@ const SubjectSelector = ({ selectedSubject, setSelectedSubject, subjects, setSub
 
       {/* "+" button to add subject manually */}
       <button onClick={addSubject} style={{ marginLeft: '0.5rem' }}>+</button>
+      <button onClick={searchSubject} style={{ marginLeft: '0.3rem' }}>🔍</button>
 
       {/* List of existing subjects */}
       <ul style={{ listStyle: 'none', padding: 0, marginTop: '1rem' }}>
