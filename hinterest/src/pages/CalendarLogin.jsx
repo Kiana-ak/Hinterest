@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
-// Replace this with your real client ID
-const clientId = 'YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com';
+// your client ID
+const clientId = '328485909923-lma8urgooh0t9o2ldl2lqueh8kg34al9.apps.googleusercontent.com';
 
 function CalendarLogin() {
   const navigate = useNavigate();
