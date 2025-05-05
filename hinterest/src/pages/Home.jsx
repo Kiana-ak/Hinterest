@@ -18,13 +18,28 @@ function Home() {
   const [showRightSidebar, setShowRightSidebar] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/api/test')
-      .then((res) => res.text())
-      .then((data) => setMessage(data))
-      .catch((err) => {
-        console.error('Error fetching API:', err);
-        setMessage('Failed to connect to backend.');
-      });
+    const fetchSubjects = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch('http://localhost:5000/api/subjects', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+  
+        if (!response.ok) {
+          throw new Error('Failed to fetch subjects');
+        }
+  
+        const data = await response.json();
+        setSubjects(data); // stores full subject objects
+
+      } catch (err) {
+        console.error('Error fetching subjects:', err);
+      }
+    };
+  
+    fetchSubjects();
   }, []);
 
   return (

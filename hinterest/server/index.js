@@ -4,24 +4,26 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require('./user'); // your user model
+const User = require('./user');
+const subjectRoutes = require('./subjects'); // ✅ This already handles all /api/subjects routes
 
 const app = express();
 const PORT = 5000;
+const JWT_SECRET = "supersecretkey";
 
-// Middleware (MUST be before routes)
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
+// ✅ Connect to MongoDB Atlas
 const uri = "mongodb+srv://hinterest1:M1DxqiRIpYyt4KLJ@hinterest-cluster.5eafkyj.mongodb.net/?retryWrites=true&w=majority&appName=hinterest-cluster";
 mongoose.connect(uri)
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// Register route
+// ✅ Register route
 app.post('/api/register', async (req, res) => {
-  console.log("Login request received with body:", req.body); // debug
+  console.log("Register request received with body:", req.body);
   const { email, password } = req.body;
 
   try {
@@ -36,28 +38,18 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// Login route
-const JWT_SECRET = "supersecretkey";
+// ✅ Login route
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(400).json({ error: "User not found" });
-    }
+    if (!user) return res.status(400).json({ error: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) return res.status(401).json({ error: "Incorrect password" });
 
-    if (!isMatch) {
-      return res.status(401).json({ error: "Incorrect password" });
-    }
-
-    const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, {
-      expiresIn: "2h"
-    });
-
+    const token = jwt.sign({ userId: user._id, email: user.email }, JWT_SECRET, { expiresIn: "2h" });
     res.json({ message: "Login successful", token });
   } catch (err) {
     console.error(err);
@@ -65,11 +57,14 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// Test routes
+// ✅ Mount subject routes (includes /api/subjects GET and POST)
+app.use(subjectRoutes);
+
+// ✅ Test routes
 app.get('/', (req, res) => res.send('Hinterest backend is working!'));
 app.get('/api/test', (req, res) => res.send('API test works!'));
 
-// Start server
+// ✅ Start server (only once)
 app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
