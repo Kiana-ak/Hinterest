@@ -1,6 +1,7 @@
 import HinterestSidebar from './HinterestSidebar';
 import HinterestContent from './HinterestContent';
 import HinterestRightBar from './HinterestRightBar';
+import './Themes/themes.css';
 
 export default function HinterestUI() {
   return (
