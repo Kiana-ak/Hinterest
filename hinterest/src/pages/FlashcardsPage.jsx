@@ -12,20 +12,67 @@ const FlashcardsPage = ({ subject }) => {
   // Load flashcards when component mounts or subject changes
   useEffect(() => {
     if (subject) {
-      const savedCards = localStorage.getItem(`flashcards_${subject}`);
-      if (savedCards) {
-        setFlashcards(JSON.parse(savedCards));
-      } else {
-        setFlashcards([]);
-      }
+      fetch(`/api/flashcards/${subject}`)
+        .then(response => response.json())
+        .then(data => {
+          setFlashcards(data.flashcards || []);
+        })
+        .catch(error => {
+          console.error('Error fetching flashcards:', error);
+          // Fallback to localStorage if API fails
+          const savedCards = localStorage.getItem(`flashcards_${subject}`);
+          if (savedCards) {
+            setFlashcards(JSON.parse(savedCards));
+          } else {
+            setFlashcards([]);
+          }
+        });
     }
   }, [subject]);
 
-  // Save flashcards to localStorage
-  const saveFlashcards = (cards) => {
+  // Generate flashcards using Gemini API
+  const generateFlashcards = async (content) => {
+    try {
+      const response = await fetch('/api/generate-flashcards', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject,
+          content
+        }),
+      });
+      const data = await response.json();
+      if (data.flashcards) {
+        saveFlashcards([...flashcards, ...data.flashcards]);
+      }
+    } catch (error) {
+      console.error('Error generating flashcards:', error);
+    }
+  };
+
+  // Save flashcards to backend
+  const saveFlashcards = async (cards) => {
     if (subject) {
-      localStorage.setItem(`flashcards_${subject}`, JSON.stringify(cards));
-      setFlashcards(cards);
+      try {
+        await fetch('/api/flashcards', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            subject,
+            flashcards: cards
+          }),
+        });
+        setFlashcards(cards);
+      } catch (error) {
+        console.error('Error saving flashcards:', error);
+        // Fallback to localStorage
+        localStorage.setItem(`flashcards_${subject}`, JSON.stringify(cards));
+        setFlashcards(cards);
+      }
     }
   };
 
@@ -75,6 +122,39 @@ const FlashcardsPage = ({ subject }) => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
       setShowAnswer({});
+    }
+  };
+
+  // Add new state for generate content
+  const [generateContent, setGenerateContent] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  // Add generate function
+  const handleGenerate = async () => {
+    if (!generateContent.trim()) return;
+    
+    setIsGenerating(true);
+    try {
+      const response = await fetch('/api/generate-flashcards', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          subject,
+          content: generateContent
+        }),
+      });
+      
+      const data = await response.json();
+      if (data.flashcards) {
+        saveFlashcards([...flashcards, ...data.flashcards]);
+        setGenerateContent('');
+      }
+    } catch (error) {
+      console.error('Error generating flashcards:', error);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
