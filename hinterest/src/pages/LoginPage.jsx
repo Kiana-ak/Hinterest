@@ -8,35 +8,66 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const [error, setError] = useState(''); // Add error state
 
   const navigate = useNavigate();
 
-  const handleSubmit = async () => {
-    const endpoint = isLogin ? '/api/login' : '/api/register';
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isLogin) {
+      // Handle login
+      try {
+        const response = await fetch('http://localhost:5000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            password
+          })
+        });
 
-    try {
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setMessage(data.message || 'Success!');
-        if (isLogin) {
-          localStorage.setItem('token', data.token);
-          navigate('/home');
-        } else {
-          setIsLogin(true); // After signup, go to login
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || 'Login failed');
         }
-      } else {
-        setMessage(data.error || 'Something went wrong.');
+
+        localStorage.setItem('token', data.token);
+        navigate('/home');
+      } catch (error) {
+        setError(error.message);
       }
-    } catch (err) {
-      console.error(err);
-      setMessage('Server error.');
+    } else {
+      // Handle registration
+      try {
+        const response = await fetch('http://localhost:5000/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email,
+            password
+          })
+        });
+    
+        const data = await response.json();
+        if (!response.ok) {
+          // Only set error message, not both error and message
+          setError(data.message || 'Registration failed. Please try again.');
+          return;
+        }
+    
+        // Handle successful registration
+        setError(''); // Clear any existing errors
+        setMessage('Registration successful!');
+        localStorage.setItem('token', data.token);
+        navigate('/home');
+      } catch (error) {
+        setError(error.message || 'Server error. Please try again later.');
+        setMessage(''); // Clear any existing success message
+      }
     }
   };
 
@@ -61,21 +92,26 @@ function Login() {
         textAlign: 'center'
       }}>
         <h2>{isLogin ? 'Login to Hinterest' : 'Create an Account'}</h2>
-        <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+        <form onSubmit={handleSubmit}>
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           /><br /><br />
           <input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
+            minLength="6"
           /><br /><br />
           <button type="submit">{isLogin ? 'Login' : 'Sign Up'}</button>
         </form>
+        {/* Display both error and message */}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
         <p style={{ color: isLogin ? 'gray' : 'green' }}>{message}</p>
   
         <div style={{ marginTop: '1rem' }}>
@@ -104,7 +140,6 @@ function Login() {
       </div>
     </div>
   );
-  
 }
 
 export default Login;
