@@ -98,28 +98,4 @@ function Home() {
             width: '220px',
             background: 'var(--bg-color)',
             color: 'var(--text-color)',
-            padding: '1rem',
-            borderLeft: '1px solid #ccc',
-          }}
-        >
-          <button onClick={() => setShowRightSidebar(false)} style={{ marginBottom: '0.5rem' }}>Hide →</button>
-          <HinterestRightBar />
-        </div>
-      ) : (
-        <div
-          style={{
-            width: '40px',
-            background: 'var(--bg-color)',
-            color: 'var(--text-color)',
-            padding: '1rem',
-            borderLeft: '1px solid #ccc',
-          }}
-        >
-          <button onClick={() => setShowRightSidebar(true)}>←</button>
-        </div>
-      )}
-    </div>
-  );
-}
-
-export default Home;
+            padding: '1rem'

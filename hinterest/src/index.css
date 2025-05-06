@@ -7,10 +7,4 @@ root {
 
   background-color: var(--bg-color); 
   color: var(--text-color);
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
+  transition: background-color 0.3s ease, co

@@ -18,20 +18,4 @@ export default function HinterestSidebar() {
           <div className="pl-2 text-sm">AI</div>
           <div className="pl-2 text-sm">Java</div>
           <div className="pl-2 text-sm">Physics</div>
-          <div className="pl-2 text-sm">Science</div>
-          <div className="text-sm">...</div>
-        </div>
-      </div>
-
-      {/* Dark/Light Toggle Button */}
-      <div className="p-4 mt-auto">
-        <button
-          onClick={toggleTheme}
-          className="w-full px-2 py-1 text-sm border rounded hover:bg-gray-100"
-        >
-          {theme === 'light' ? '🌙 Dark Mode' : '☀️ Light Mode'}
-        </button>
-      </div>
-    </div>
-  );
-}
+          <

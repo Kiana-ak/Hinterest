@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import Home from './pages/Home';
 import CalendarLogin from './pages/CalendarLogin';
 import CalendarPage from './pages/CalendarPage';
+import './Themes/themes.css';
 
 function App() {
   return (

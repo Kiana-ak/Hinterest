@@ -22,20 +22,4 @@ export default function HinterestRightBar() {
 
       <button style={buttonStyle} onClick={() => navigate('/flashcards')}>📚 Flashcards</button>
       <button style={buttonStyle}>📝 Notes</button>
-      <button style={buttonStyle}>🧠 Quizzes</button>
-      <button style={buttonStyle}>📊 Performance</button>
-
-      <hr style={{ margin: '1rem 0' }} />
-
-      <button
-        onClick={toggleTheme}
-        style={{
-          ...buttonStyle,
-          backgroundColor: theme === 'dark' ? '#444' : '#eee'
-        }}
-      >
-        {theme === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode'}
-      </button>
-    </div>
-  );
-}
+      <button st
