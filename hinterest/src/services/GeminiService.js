@@ -9,7 +9,7 @@ const chatHistoriesBySubject = {};
 export const getGeminiResponse = async (chatHistory, subjectId) => {
   // Store the chat history for this subject
   if (subjectId) {
-    chatHistoriesBySubject[subjectId] = chatHistory;
+    chatHistoriesBySubject[subjectId] = [...chatHistory]; // Make a copy to avoid reference issues
   }
   
   // Convert your messages to Gemini format
@@ -33,12 +33,38 @@ export const getGeminiResponse = async (chatHistory, subjectId) => {
 
 // Function to get chat history for a specific subject
 export const getChatHistoryForSubject = (subjectId) => {
-  return chatHistoriesBySubject[subjectId] || [];
+  return subjectId && chatHistoriesBySubject[subjectId] ? [...chatHistoriesBySubject[subjectId]] : [];
 };
 
 // Function to clear chat history for a specific subject
 export const clearChatHistory = (subjectId) => {
-  if (chatHistoriesBySubject[subjectId]) {
+  if (subjectId && chatHistoriesBySubject[subjectId]) {
     delete chatHistoriesBySubject[subjectId];
   }
+};
+
+// Function to save chat history to localStorage
+export const saveChatHistoryToLocalStorage = (subjectId, chatHistory) => {
+  if (subjectId && chatHistory) {
+    localStorage.setItem(`chat_history_${subjectId}`, JSON.stringify(chatHistory));
+  }
+};
+
+// Function to load chat history from localStorage
+export const loadChatHistoryFromLocalStorage = (subjectId) => {
+  if (!subjectId) return [];
+  
+  const savedHistory = localStorage.getItem(`chat_history_${subjectId}`);
+  if (savedHistory) {
+    try {
+      const parsedHistory = JSON.parse(savedHistory);
+      // Also update the in-memory history
+      chatHistoriesBySubject[subjectId] = parsedHistory;
+      return parsedHistory;
+    } catch (e) {
+      console.error('Error parsing chat history:', e);
+      return [];
+    }
+  }
+  return [];
 };

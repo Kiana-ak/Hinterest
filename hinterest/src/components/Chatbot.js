@@ -1,66 +1,91 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { getGeminiResponse, getChatHistoryForSubject, clearChatHistory } from '../services/GeminiService';
+import { 
+  getGeminiResponse, 
+  getChatHistoryForSubject, 
+  clearChatHistory,
+  saveChatHistoryToLocalStorage,
+  loadChatHistoryFromLocalStorage
+} from '../services/GeminiService';
 
 function Chatbot({ subject }) {
   const [question, setQuestion] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [subjectName, setSubjectName] = useState('');
+  const currentSubjectRef = useRef(null);
+
+  // Extract subject ID consistently
+  const getSubjectId = (subjectObj) => {
+    if (!subjectObj) return null;
+    return typeof subjectObj === 'object' ? subjectObj._id : subjectObj;
+  };
+
+  // Extract subject name consistently
+  const getSubjectName = (subjectObj) => {
+    if (!subjectObj) return 'Unknown Subject';
+    
+    if (typeof subjectObj === 'object' && subjectObj.name) {
+      return subjectObj.name;
+    }
+    
+    // If it's just an ID, try to get the name from localStorage
+    const subjectId = getSubjectId(subjectObj);
+    const subjectData = localStorage.getItem(`subject_${subjectId}`);
+    if (subjectData) {
+      try {
+        const parsedData = JSON.parse(subjectData);
+        return parsedData.name || subjectId;
+      } catch (e) {
+        return subjectId;
+      }
+    }
+    
+    return subjectId;
+  };
 
   // Set subject name and load chat history when subject changes
   useEffect(() => {
     if (!subject) return;
     
-    // Extract subject name
-    if (typeof subject === 'object') {
-      setSubjectName(subject.name || 'Unknown Subject');
-    } else if (typeof subject === 'string') {
-      // If it's just a string ID, try to get the name from localStorage
-      const subjectData = localStorage.getItem(`subject_${subject}`);
-      if (subjectData) {
-        try {
-          const parsedData = JSON.parse(subjectData);
-          setSubjectName(parsedData.name || subject);
-        } catch (e) {
-          setSubjectName(subject);
-        }
-      } else {
-        setSubjectName(subject);
-      }
-    }
+    const subjectId = getSubjectId(subject);
+    const name = getSubjectName(subject);
     
-    // Load chat history from localStorage
-    const subjectId = subject._id || subject;
-    const savedHistory = localStorage.getItem(`chat_history_${subjectId}`);
-    if (savedHistory) {
-      try {
-        setChatHistory(JSON.parse(savedHistory));
-      } catch (e) {
-        console.error('Error parsing chat history:', e);
-        setChatHistory([]);
-      }
+    // Save current subject ID to ref for comparison
+    currentSubjectRef.current = subjectId;
+    setSubjectName(name);
+    
+    // First try to load from localStorage
+    const localStorageHistory = loadChatHistoryFromLocalStorage(subjectId);
+    
+    if (localStorageHistory && localStorageHistory.length > 0) {
+      setChatHistory(localStorageHistory);
     } else {
-      // Try to get history from memory
+      // If not in localStorage, try in-memory
       const memoryHistory = getChatHistoryForSubject(subjectId);
       if (memoryHistory && memoryHistory.length > 0) {
         setChatHistory(memoryHistory);
+        // Also save to localStorage for persistence
+        saveChatHistoryToLocalStorage(subjectId, memoryHistory);
       } else {
         setChatHistory([]);
       }
     }
   }, [subject]);
 
-  // Save chat history to localStorage whenever it changes
+  // Save chat history to both memory and localStorage whenever it changes
   useEffect(() => {
-    if (chatHistory.length > 0 && subject) {
-      const subjectId = subject._id || subject;
-      localStorage.setItem(`chat_history_${subjectId}`, JSON.stringify(chatHistory));
+    if (chatHistory.length > 0 && currentSubjectRef.current) {
+      const subjectId = currentSubjectRef.current;
+      saveChatHistoryToLocalStorage(subjectId, chatHistory);
     }
-  }, [chatHistory, subject]);
+  }, [chatHistory]);
 
   const handleSend = async () => {
     if (!question.trim()) return;
+    
+    const subjectId = getSubjectId(subject);
+    if (!subjectId) return;
   
     const newUserMessage = { sender: 'user', text: question };
     const updatedChat = [...chatHistory, newUserMessage];
@@ -71,11 +96,11 @@ function Chatbot({ subject }) {
   
     try {
       // Pass the subject ID to getGeminiResponse
-      const subjectId = subject._id || subject;
       const answer = await getGeminiResponse(updatedChat, subjectId);
       const botMessage = { sender: 'gemini', text: answer };
       setChatHistory((prev) => [...prev, botMessage]);
     } catch (error) {
+      console.error("Error getting Gemini response:", error);
       const errorMessage = { sender: 'gemini', text: "Gemini didn't respond. Please try again." };
       setChatHistory((prev) => [...prev, errorMessage]);
     }
@@ -85,7 +110,9 @@ function Chatbot({ subject }) {
 
   // Clear chat history for this subject
   const handleClearChat = () => {
-    const subjectId = subject._id || subject;
+    const subjectId = getSubjectId(subject);
+    if (!subjectId) return;
+    
     setChatHistory([]);
     clearChatHistory(subjectId);
     localStorage.removeItem(`chat_history_${subjectId}`);
