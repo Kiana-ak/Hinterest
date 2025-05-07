@@ -1,16 +1,18 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const flashcardSchema = new mongoose.Schema({
+const FlashcardSchema = new Schema({
+  term: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
   subject: {
-    type: String,
-    required: true
-  },
-  question: {
-    type: String,
-    required: true
-  },
-  answer: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Subject',
     required: true
   },
   user: {
@@ -21,8 +23,11 @@ const flashcardSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
   }
 });
 
-const Flashcard = mongoose.model('Flashcard', flashcardSchema);
-module.exports = Flashcard;
+module.exports = mongoose.model('Flashcard', FlashcardSchema);

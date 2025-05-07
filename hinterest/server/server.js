@@ -26,7 +26,8 @@ connection.once('open', () => {
 // Routes
 app.use('/api/subjects', require('./routes/subjects'));
 app.use('/api/notes', require('./routes/notes'));
-app.use('/api/quizzes', require('./routes/quizzes')); // Add this line
+app.use('/api/quizzes', require('./routes/quizzes'));
+app.use('/api/flashcards', require('./routes/flashcards')); // Add this line
 app.use('/api', require('./routes/auth'));
 
 // Add error handling for port in use
