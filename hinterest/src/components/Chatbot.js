@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { saveNote } from '../services/NotesService';
 import { 
   getGeminiResponse, 
   getChatHistoryForSubject, 
@@ -118,6 +119,18 @@ function Chatbot({ subject }) {
     localStorage.removeItem(`chat_history_${subjectId}`);
   };
 
+  // Function to save a message as a note
+  const saveMessageAsNote = (message) => {
+    const subjectId = getSubjectId(subject);
+    if (!subjectId) return;
+    
+    if (saveNote(subjectId, message.text)) {
+      alert('Message saved as note!');
+    } else {
+      alert('Failed to save note. Please try again.');
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '70vh' }}>
       {/* Subject Title */}
@@ -165,6 +178,26 @@ function Chatbot({ subject }) {
             >
               <strong>{msg.sender === 'user' ? 'You' : 'Gemini'}:</strong>
               <ReactMarkdown>{msg.text}</ReactMarkdown>
+              
+              {/* Add Save as Note button for Gemini messages */}
+              {msg.sender === 'gemini' && (
+                <div style={{ textAlign: 'right', marginTop: '0.5rem' }}>
+                  <button
+                    onClick={() => saveMessageAsNote(msg)}
+                    style={{
+                      fontSize: '0.8rem',
+                      padding: '0.25rem 0.5rem',
+                      backgroundColor: '#4CAF50', /* Green */
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Save as Note
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         ))}
