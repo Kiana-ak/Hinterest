@@ -1,10 +1,17 @@
 import axios from 'axios';
 
 const API_KEY = process.env.REACT_APP_GEMINI_API_KEY;
-
 const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent?key=${API_KEY}`;
 
-export const getGeminiResponse = async (chatHistory) => {
+// Store chat histories by subject ID
+const chatHistoriesBySubject = {};
+
+export const getGeminiResponse = async (chatHistory, subjectId) => {
+  // Store the chat history for this subject
+  if (subjectId) {
+    chatHistoriesBySubject[subjectId] = chatHistory;
+  }
+  
   // Convert your messages to Gemini format
   const contents = chatHistory.map(msg => ({
     role: msg.sender === 'user' ? 'user' : 'model',
@@ -13,7 +20,6 @@ export const getGeminiResponse = async (chatHistory) => {
 
   try {
     const response = await axios.post(API_URL, { contents });
-
     console.log("Gemini full response:", response.data);
     return response.data.candidates[0].content.parts[0].text;
   } catch (error) {
@@ -22,5 +28,17 @@ export const getGeminiResponse = async (chatHistory) => {
       console.error("Full Gemini error response:", JSON.stringify(error.response.data, null, 2));
     }
     throw error;
+  }
+};
+
+// Function to get chat history for a specific subject
+export const getChatHistoryForSubject = (subjectId) => {
+  return chatHistoriesBySubject[subjectId] || [];
+};
+
+// Function to clear chat history for a specific subject
+export const clearChatHistory = (subjectId) => {
+  if (chatHistoriesBySubject[subjectId]) {
+    delete chatHistoriesBySubject[subjectId];
   }
 };
