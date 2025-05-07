@@ -122,11 +122,20 @@ function Chatbot({ subject }) {
   // Function to save a message as a note
   const saveMessageAsNote = (message) => {
     const subjectId = getSubjectId(subject);
-    if (!subjectId) return;
+    if (!subjectId) {
+      console.error('Cannot save note: No subject ID available');
+      alert('Failed to save note: No subject selected.');
+      return;
+    }
+    
+    console.log('Saving message as note for subject:', subjectId);
+    console.log('Message content:', message.text);
     
     if (saveNote(subjectId, message.text)) {
+      console.log('Note saved successfully');
       alert('Message saved as note!');
     } else {
+      console.error('Failed to save note');
       alert('Failed to save note. Please try again.');
     }
   };
