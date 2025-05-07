@@ -8,6 +8,7 @@ function Quizcard({ subject }) {
   const [currentQuiz, setCurrentQuiz] = useState(null);
   const [takingQuiz, setTakingQuiz] = useState(false);
   const [quizResults, setQuizResults] = useState(null);
+  const [subjectName, setSubjectName] = useState('');
   
   // Form states
   const [title, setTitle] = useState('');
@@ -344,7 +345,7 @@ function Quizcard({ subject }) {
 
   return (
     <div>
-      <h2>Quizzes for {subject}</h2>
+      <h2>Quizzes for {subjectName}</h2>
       
       {error && <p style={{ color: 'red' }}>{error}</p>}
       
@@ -807,6 +808,42 @@ function Quizcard({ subject }) {
       )}
     </div>
   );
+
+  // Set subject name when component mounts or subject changes
+  useEffect(() => {
+    if (subject) {
+      // If subject is an object with a name property, use that
+      if (typeof subject === 'object' && subject.name) {
+        setSubjectName(subject.name);
+      } 
+      // Otherwise use the subject directly (likely an ID string)
+      else {
+        // Try to fetch the subject name if we only have the ID
+        const fetchSubjectName = async () => {
+          try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/subjects/${subject}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              setSubjectName(data.name);
+            } else {
+              setSubjectName(subject); // Fallback to using the ID
+            }
+          } catch (err) {
+            console.error('Error fetching subject name:', err);
+            setSubjectName(subject); // Fallback to using the ID
+          }
+        };
+        
+        fetchSubjectName();
+      }
+    }
+  }, [subject]);
 }
 
 export default Quizcard;
