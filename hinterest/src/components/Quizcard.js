@@ -18,6 +18,46 @@ function Quizcard({ subject }) {
     options: [{ text: '', isCorrect: false }, { text: '', isCorrect: false }],
     explanation: '' 
   }]);
+  
+  // Quiz taking states
+  const [userAnswers, setUserAnswers] = useState([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+
+  // Set subject name when component mounts or subject changes
+  useEffect(() => {
+    if (subject) {
+      // If subject is an object with a name property, use that
+      if (typeof subject === 'object' && subject.name) {
+        setSubjectName(subject.name);
+      } 
+      // Otherwise use the subject directly (likely an ID string)
+      else {
+        // Try to fetch the subject name if we only have the ID
+        const fetchSubjectName = async () => {
+          try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:5000/api/subjects/${subject}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              setSubjectName(data.name);
+            } else {
+              setSubjectName(subject); // Fallback to using the ID
+            }
+          } catch (err) {
+            console.error('Error fetching subject name:', err);
+            setSubjectName(subject); // Fallback to using the ID
+          }
+        };
+        
+        fetchSubjectName();
+      }
+    }
+  }, [subject]);
 
   // Fetch quizzes for the selected subject
   useEffect(() => {
@@ -263,9 +303,6 @@ function Quizcard({ subject }) {
     setUserAnswers(initialAnswers);
   };
 
-  // Quiz taking states
-  const [userAnswers, setUserAnswers] = useState([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
   // Handle option selection during quiz
   const handleOptionSelect = (optionIndex) => {
@@ -808,42 +845,6 @@ function Quizcard({ subject }) {
       )}
     </div>
   );
-
-  // Set subject name when component mounts or subject changes
-  useEffect(() => {
-    if (subject) {
-      // If subject is an object with a name property, use that
-      if (typeof subject === 'object' && subject.name) {
-        setSubjectName(subject.name);
-      } 
-      // Otherwise use the subject directly (likely an ID string)
-      else {
-        // Try to fetch the subject name if we only have the ID
-        const fetchSubjectName = async () => {
-          try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/subjects/${subject}`, {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            });
-            
-            if (response.ok) {
-              const data = await response.json();
-              setSubjectName(data.name);
-            } else {
-              setSubjectName(subject); // Fallback to using the ID
-            }
-          } catch (err) {
-            console.error('Error fetching subject name:', err);
-            setSubjectName(subject); // Fallback to using the ID
-          }
-        };
-        
-        fetchSubjectName();
-      }
-    }
-  }, [subject]);
 }
 
 export default Quizcard;
