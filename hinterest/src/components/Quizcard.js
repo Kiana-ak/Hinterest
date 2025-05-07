@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Quizcard({ subject }) {
+  const navigate = useNavigate(); // Initialize navigate function
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -9,6 +11,15 @@ function Quizcard({ subject }) {
   const [takingQuiz, setTakingQuiz] = useState(false);
   const [quizResults, setQuizResults] = useState(null);
   const [subjectName, setSubjectName] = useState('');
+  
+  // Function to navigate to chatbot
+  const navigateToChatbot = () => {
+    if (typeof subject === 'object' && subject._id) {
+      navigate(`/chatbot/${subject._id}`);
+    } else if (typeof subject === 'string') {
+      navigate(`/chatbot/${subject}`);
+    }
+  };
   
   // Form states
   const [title, setTitle] = useState('');
@@ -382,7 +393,24 @@ function Quizcard({ subject }) {
 
   return (
     <div>
-      <h2>Quizzes for {subjectName}</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <h2>Quizzes for {subjectName}</h2>
+        
+        {/* Navigation button to Chatbot */}
+        <button 
+          onClick={navigateToChatbot}
+          style={{ 
+            padding: '0.5rem 1rem',
+            backgroundColor: '#4285f4',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Switch to Chatbot
+        </button>
+      </div>
       
       {error && <p style={{ color: 'red' }}>{error}</p>}
       

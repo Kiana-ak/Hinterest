@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function Flashcard({ subject }) {
+  const navigate = useNavigate();
   const [flashcards, setFlashcards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -653,38 +655,54 @@ function Flashcard({ subject }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
         <h2>Flashcards for {subjectName}</h2>
         
-        <div>
-          <button 
-            onClick={toggleViewMode}
-            style={{ 
-              padding: '0.5rem 1rem',
-              backgroundColor: '#f5f5f5',
-              border: '1px solid #ddd',
-              borderRadius: '4px',
-              marginRight: '0.5rem'
-            }}
-          >
-            Single Card View
-          </button>
-          
-          <button 
-            onClick={() => {
-              setNewCardTerm('');
-              setNewCardDescription('');
-              document.getElementById('gridAddCardForm').style.display = 
-                document.getElementById('gridAddCardForm').style.display === 'none' ? 'block' : 'none';
-            }}
-            style={{ 
-              padding: '0.5rem 1rem',
-              backgroundColor: '#4285f4',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px'
-            }}
-          >
-            Add Flashcard
-          </button>
-        </div>
+        {/* Navigation button to Chatbot */}
+        <button 
+          onClick={navigateToChatbot}
+          style={{ 
+            padding: '0.5rem 1rem',
+            backgroundColor: '#4285f4',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Switch to Chatbot
+        </button>
+      </div>
+      
+      <div>
+        <button 
+          onClick={toggleViewMode}
+          style={{ 
+            padding: '0.5rem 1rem',
+            backgroundColor: '#f5f5f5',
+            border: '1px solid #ddd',
+            borderRadius: '4px',
+            marginRight: '0.5rem'
+          }}
+        >
+          Single Card View
+        </button>
+        
+        <button 
+          onClick={() => {
+            setNewCardTerm('');
+            setNewCardDescription('');
+            document.getElementById('gridAddCardForm').style.display = 
+              document.getElementById('gridAddCardForm').style.display === 'none' ? 'block' : 'none';
+          }}
+          style={{ 
+            padding: '0.5rem 1rem',
+            backgroundColor: '#4285f4',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px'
+          }}
+        >
+          Add Flashcard
+        </button>
+      </div>
       </div>
       
       {/* Add flashcard form (hidden by default) */}
@@ -846,3 +864,13 @@ function Flashcard({ subject }) {
 }
 
 export default Flashcard;
+
+
+// Function to navigate to chatbot
+const navigateToChatbot = () => {
+  if (typeof subject === 'object' && subject._id) {
+    navigate(`/chatbot/${subject._id}`);
+  } else if (typeof subject === 'string') {
+    navigate(`/chatbot/${subject}`);
+  }
+};
