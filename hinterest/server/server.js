@@ -24,7 +24,8 @@ connection.once('open', () => {
 });
 
 // Routes
-app.use('/api/subjects', require('./routes/subjects')); // Make sure this path is correct
+app.use('/api/subjects', require('./routes/subjects'));
+app.use('/api/notes', require('./routes/notes')); // Add this line
 app.use('/api', require('./routes/auth'));
 
 // Add error handling for port in use
