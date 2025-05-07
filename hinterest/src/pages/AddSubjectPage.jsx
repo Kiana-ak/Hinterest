@@ -21,7 +21,7 @@ function AddSubjectPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`  // Make sure the token format is correct
         },
         body: JSON.stringify({
           name,
@@ -37,6 +37,7 @@ function AddSubjectPage() {
       navigate('/home');
     } catch (error) {
       setError(error.message);
+      console.error('Error creating subject:', error);  // Add this for debugging
     }
   };
 

@@ -26,7 +26,8 @@ function SubjectSelector({ subjects, setSubjects, selectedSubject, setSelectedSu
       });
 
       if (!response.ok) {
-        throw new Error('Failed to add subject');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to add subject');
       }
 
       const newSubject = await response.json();

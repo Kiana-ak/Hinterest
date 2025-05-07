@@ -24,8 +24,8 @@ connection.once('open', () => {
 });
 
 // Routes
-app.use('/api/subjects', require('./subjects')); 
-app.use('/api', require('./routes/auth')); // Add this line for auth routes
+app.use('/api/subjects', require('./routes/subjects')); // Make sure this path is correct
+app.use('/api', require('./routes/auth'));
 
 // Add error handling for port in use
 const port = process.env.PORT || 5000;
