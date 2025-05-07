@@ -8,7 +8,12 @@ const userSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
-  password: {
+  username: {
+    type: String,
+    trim: true
+    // removed unique constraint
+  },
+  passwordHash: {
     type: String,
     required: true
   },
@@ -18,7 +23,7 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-// Drop any existing indexes to clean up
+// Only keep email as unique
 userSchema.index({ email: 1 }, { unique: true });
 
 module.exports = mongoose.model('User', userSchema);

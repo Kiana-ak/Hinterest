@@ -5,9 +5,10 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User'); // Updated to match exact filename case
 
 // Register route
+// In your auth.js file
 router.post('/register', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, username } = req.body;  // Add username
     
     // Check if user exists
     const existingUser = await User.findOne({ email });
@@ -19,10 +20,11 @@ router.post('/register', async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create user
+    // Create user - make sure field names match your User model
     const user = new User({
       email,
-      password: hashedPassword
+      username: username || email.split('@')[0],  // Use email as fallback username
+      passwordHash: hashedPassword
     });
 
     await user.save();
@@ -33,7 +35,7 @@ router.post('/register', async (req, res) => {
     res.json({
       success: true,
       token,
-      user: { id: user._id, email: user.email }
+      user: { id: user._id, email: user.email, username: user.username }
     });
   } catch (error) {
     console.error('Registration error:', error);
