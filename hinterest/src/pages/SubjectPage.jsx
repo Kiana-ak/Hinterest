@@ -63,7 +63,7 @@ function SubjectPage() {
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: '#4285f4',
+            color: '#ffffff',
             fontSize: '16px'
           }}
         >
@@ -88,14 +88,14 @@ function SubjectPage() {
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          backgroundColor: '#f9f9f9'
+          backgroundColor: '#ffffff'
         }}>
           <h3>Flashcards</h3>
           <p>Create and study flashcards for this subject</p>
           <Link 
             to={`/flashcards/${subjectId}`}
             style={{
-              backgroundColor: '#4285f4',
+              backgroundColor: '#ffffff',
               color: 'white',
               padding: '0.75rem 1.5rem',
               borderRadius: '4px',
@@ -116,14 +116,14 @@ function SubjectPage() {
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          backgroundColor: '#f9f9f9'
+          backgroundColor: '#ffffff'
         }}>
           <h3>AI Chatbot</h3>
           <p>Ask questions and get AI-powered answers</p>
           <Link 
             to={`/chatbot/${subjectId}`}
             style={{
-              backgroundColor: '#4285f4',
+              backgroundColor: '#ffffff',
               color: 'white',
               padding: '0.75rem 1.5rem',
               borderRadius: '4px',
@@ -135,7 +135,7 @@ function SubjectPage() {
           </Link>
         </div>
         
-        {/* Add more learning tools here as needed */}
+        {/* Add more learning tools latter */}
       </div>
     </div>
   );

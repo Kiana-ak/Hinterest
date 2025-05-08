@@ -151,7 +151,7 @@ function Chatbot({ subject }) {
           onClick={handleClearChat}
           style={{ 
             padding: '0.25rem 0.5rem',
-            backgroundColor: '#f5f5f5',
+            backgroundColor: '#ffffff',
             border: '1px solid #ddd',
             borderRadius: '4px',
             cursor: 'pointer'
@@ -168,7 +168,7 @@ function Chatbot({ subject }) {
           overflowY: 'auto',
           padding: '1rem',
           minHeight: '300px',
-          background: '#f2f2f2',
+          background: '#ffe6ff',//chat color
           borderRadius: '8px',
           display: 'flex',
           flexDirection: 'column-reverse'  // THIS is what pushes newest messages down
@@ -181,7 +181,7 @@ function Chatbot({ subject }) {
                 display: 'inline-block',
                 padding: '0.75rem',
                 borderRadius: '10px',
-                backgroundColor: msg.sender === 'user' ? '#d1e7dd' : '#fff',
+                backgroundColor: msg.sender === 'user' ? '#ffffb3' : '#ffffff',//your message color and AI message
                 maxWidth: '80%',
               }}
             >
@@ -196,7 +196,7 @@ function Chatbot({ subject }) {
                     style={{
                       fontSize: '0.8rem',
                       padding: '0.25rem 0.5rem',
-                      backgroundColor: '#4CAF50', /* Green */
+                      backgroundColor: '#ffffff',
                       color: 'white',
                       border: 'none',
                       borderRadius: '4px',

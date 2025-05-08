@@ -69,7 +69,7 @@ function SubjectSelector({ subjects, setSubjects, selectedSubject, setSelectedSu
             style={{ 
               padding: '8px', 
               margin: '4px 0',
-              backgroundColor: selectedSubject === subject._id ? '#ddd' : 'transparent',
+              backgroundColor: selectedSubject === subject._id ? '#fff' : 'transparent',
               borderRadius: '4px',
               cursor: 'pointer'
             }}

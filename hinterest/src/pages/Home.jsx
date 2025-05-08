@@ -46,8 +46,8 @@ function Home() {
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)' }}>
   {/* Left Sidebar */}
   {showLeftSidebar && (
-  <div style={{ width: '220px', background: '#eee', padding: '1rem' }}>
-    <button onClick={() => setShowLeftSidebar(false)} style={{ marginBottom: '0.5rem' }}>← Hide</button>
+  <div style={{ width: '220px', background: '#ffe6ff', padding: '1rem' }}>
+    <button onClick={() => setShowLeftSidebar(false)} style={{ marginBottom: '0.5rem' }}>☰</button>
 
     <h3>Menu</h3>
     <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
@@ -68,8 +68,8 @@ function Home() {
 )}
 
   {!showLeftSidebar && (
-    <div style={{ width: '40px', background: '#eee', padding: '1rem' }}>
-      <button onClick={() => setShowLeftSidebar(true)}>→</button>
+    <div style={{ width: '40px', background: '#ffffff', padding: '1rem' }}>
+      <button onClick={() => setShowLeftSidebar(true)}>☰</button>
     </div>
   )}
 
@@ -83,24 +83,64 @@ function Home() {
         {selectedTool === 'quizzes' && <Quizzes subject={selectedSubject} />}
       </>
     ) : (
-      <p style={{ color: 'gray' }}>Please select or add a subject to begin.</p>
+      <p style={{ color: 'white' }}>Please select or add a subject to begin.</p>
     )}
   </div>
 
   {/* Right Sidebar */}
   {showRightSidebar && (
-    <div style={{ width: '200px', background: '#f5f5f5', padding: '1rem' }}>
-      <button onClick={() => setShowRightSidebar(false)} style={{ marginBottom: '0.5rem' }}>Hide →</button>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-        <button onClick={() => setSelectedTool('flashcards')}>📚 Flashcards</button>
-        <button onClick={() => setSelectedTool('notes')}>📝 Notes</button>
-        <button onClick={() => setSelectedTool('quizzes')}>🧠 Quizzes</button>
-      </div>
+    <div style={{ width: '200px', background: '#ffe6ff', padding: '1rem' }}>
+      <button onClick={() => setShowRightSidebar(false)} style={{ marginBottom: '0.5rem' }}>☰</button>
+      <div>
+  <h3>Tools</h3>
+  <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
+    <li
+      onClick={() => setSelectedTool('flashcards')}
+      style={{
+        padding: '8px',
+        margin: '4px 0',
+        backgroundColor: selectedTool === 'flashcards' ? '#fff' : 'transparent',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        color: '#000'
+      }}
+    >
+      📖 Flashcards
+    </li>
+    <li
+      onClick={() => setSelectedTool('notes')}
+      style={{
+        padding: '8px',
+        margin: '4px 0',
+        backgroundColor: selectedTool === 'notes' ? '#fff' : 'transparent',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        color: '#000'
+      }}
+    >
+      🗒️ Notes
+    </li>
+    <li
+      onClick={() => setSelectedTool('quizzes')}
+      style={{
+        padding: '8px',
+        margin: '4px 0',
+        backgroundColor: selectedTool === 'quizzes' ? '#fff' : 'transparent',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        color: '#000'
+      }}
+    >
+      🧠 Quizzes
+    </li>
+  </ul>
+</div>
+
     </div>
   )}
   {!showRightSidebar && (
-    <div style={{ width: '40px', background: '#f5f5f5', padding: '1rem' }}>
-      <button onClick={() => setShowRightSidebar(true)}>←</button>
+    <div style={{ width: '40px', background: '#ffffff', padding: '1rem' }}>
+      <button onClick={() => setShowRightSidebar(true)}>☰</button>
     </div>
   )}
 </div>

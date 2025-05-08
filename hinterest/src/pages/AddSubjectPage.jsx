@@ -50,7 +50,7 @@ function AddSubjectPage() {
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: '#4285f4',
+            color: '#ffffff',
             fontSize: '16px',
             marginRight: '1rem'
           }}
@@ -63,8 +63,8 @@ function AddSubjectPage() {
       {error && (
         <div style={{ 
           padding: '0.75rem', 
-          backgroundColor: '#ffebee', 
-          color: '#d32f2f', 
+          backgroundColor: '#fff', 
+          color: '#fff', 
           borderRadius: '4px',
           marginBottom: '1rem'
         }}>
@@ -84,7 +84,7 @@ function AddSubjectPage() {
             style={{ 
               width: '100%', 
               padding: '0.75rem', 
-              border: '1px solid #ddd',
+              border: '1px solid #fff',
               borderRadius: '4px',
               fontSize: '16px'
             }}
@@ -118,7 +118,7 @@ function AddSubjectPage() {
             onClick={() => navigate('/home')}
             style={{ 
               padding: '0.75rem 1.5rem',
-              background: '#f5f5f5',
+              background: '#ffffff',
               border: '1px solid #ddd',
               borderRadius: '4px',
               fontSize: '16px',
@@ -131,7 +131,7 @@ function AddSubjectPage() {
             type="submit"
             style={{ 
               padding: '0.75rem 1.5rem',
-              backgroundColor: '#4285f4',
+              backgroundColor: '#fff',
               color: 'white',
               border: 'none',
               borderRadius: '4px',

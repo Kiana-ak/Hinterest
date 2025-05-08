@@ -39,7 +39,7 @@ function ChatbotPage() {
   }, [subjectId, navigate]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: '100vhz' }}>
       <div style={{ padding: '1rem', borderBottom: '1px solid #eee' }}>
         <button 
           onClick={() => navigate('/home')}
@@ -47,7 +47,7 @@ function ChatbotPage() {
             background: 'none',
             border: 'none',
             cursor: 'pointer',
-            color: '#4285f4',
+            color: '#fff',
             fontSize: '16px'
           }}
         >
