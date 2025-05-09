@@ -4,6 +4,7 @@ function SubjectSelector({ subjects, setSubjects, selectedSubject, setSelectedSu
   const [newSubjectName, setNewSubjectName] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleAddSubject = async () => {
     if (!newSubjectName.trim()) {
@@ -58,11 +59,21 @@ function SubjectSelector({ subjects, setSubjects, selectedSubject, setSelectedSu
   return (
     <div>
       <h3>Your Subjects</h3>
-      
+
+      <input
+        type="text"
+        placeholder="Search subjects..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        style={{ width: '85%', marginBottom: '10px', padding: '6px' }}
+      />
+ 
       {error && <p style={{ color: 'red' }}>{error}</p>}
       
       <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
-        {subjects.map(subject => (
+      {subjects
+        .filter(subject => subject.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        .map(subject => (
           <li 
             key={subject._id} 
             onClick={() => handleSelectSubject(subject._id)}

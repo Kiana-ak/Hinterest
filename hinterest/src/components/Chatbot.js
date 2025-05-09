@@ -15,6 +15,7 @@ function Chatbot({ subject }) {
   const [loading, setLoading] = useState(false);
   const [subjectName, setSubjectName] = useState('');
   const currentSubjectRef = useRef(null);
+  const fileInputRef = useRef();
 
   // Extract subject ID consistently
   const getSubjectId = (subjectObj) => {
@@ -81,6 +82,34 @@ function Chatbot({ subject }) {
       saveChatHistoryToLocalStorage(subjectId, chatHistory);
     }
   }, [chatHistory]);
+
+  const handleUploadClick = () => {
+    fileInputRef.current.click();
+  };
+  
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+  
+    if (!['text/plain', 'text/markdown'].includes(file.type)) {
+      alert('Only .txt or .md files are supported.');
+      return;
+    }
+  
+    if (file.size > 1024 * 1024) {
+      alert('File size must be under 1MB.');
+      return;
+    }
+  
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const fileContent = e.target.result;
+      const prompt = `Analyze the following document for key takeaways and insights:\n\n${fileContent}`;
+      setQuestion(prompt);
+    };
+    reader.readAsText(file);
+  };
+
 
   const handleSend = async () => {
     if (!question.trim()) return;
@@ -214,6 +243,17 @@ function Chatbot({ subject }) {
 
       {/* Input Bar (fixed at bottom) */}
       <div style={{ display: 'flex', padding: '1rem', borderTop: '1px solid #ccc', backgroundColor: 'white' }}>
+        <button onClick={handleUploadClick} style={{ marginRight: '0.5rem' }} title="Upload Document">
+          ➕
+        </button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileUpload}
+          accept=".txt,.md"
+          style={{ display: 'none' }}
+        />
+
         <input
           type="text"
           value={question}
