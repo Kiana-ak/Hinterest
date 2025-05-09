@@ -46,7 +46,7 @@ function Home() {
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)' }}>
   {/* Left Sidebar */}
   {showLeftSidebar && (
-  <div style={{ width: '220px', background: '#ffe6ff', padding: '1rem' }}>
+  <div style={{ width: '220px', background: '#ffffcc', padding: '1rem' }}>
     <button onClick={() => setShowLeftSidebar(false)} style={{ marginBottom: '0.5rem' }}>☰</button>
 
     <h3>Menu</h3>
@@ -89,7 +89,7 @@ function Home() {
 
   {/* Right Sidebar */}
   {showRightSidebar && (
-    <div style={{ width: '200px', background: '#ffe6ff', padding: '1rem' }}>
+    <div style={{ width: '200px', background: '#ffffcc', padding: '1rem' }}>
       <button onClick={() => setShowRightSidebar(false)} style={{ marginBottom: '0.5rem' }}>☰</button>
       <div>
   <h3>Tools</h3>

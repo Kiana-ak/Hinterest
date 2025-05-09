@@ -168,7 +168,7 @@ function Chatbot({ subject }) {
           overflowY: 'auto',
           padding: '1rem',
           minHeight: '300px',
-          background: '#ffe6ff',//chat color
+          background: '#ffffcc',//chat color
           borderRadius: '8px',
           display: 'flex',
           flexDirection: 'column-reverse'  // THIS is what pushes newest messages down
