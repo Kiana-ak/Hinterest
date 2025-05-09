@@ -168,7 +168,7 @@ export default function Flashcards({ subject }) {
                 width: '100%',
                 height: '100%',
                 backfaceVisibility: 'hidden',
-                backgroundColor: '#e8f4ff',
+                backgroundColor: '#b3ffb3',
                 transform: 'rotateY(180deg)',
                 display: 'flex',
                 alignItems: 'center',
