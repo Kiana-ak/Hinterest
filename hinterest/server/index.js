@@ -1,29 +1,36 @@
-// Load modules
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
 const User = require('./user');
-const subjectRoutes = require('./subjects'); // ✅ This already handles all /api/subjects routes
+const subjectRoutes = require('./routes/subjects');
+const notesRoutes = require('./routes/notes');
+const quizzesRoutes = require('./routes/quizzes');
+const flashcardsRoutes = require('./routes/flashcards');
+
+mongoose.set('strictQuery', false);
 
 const app = express();
-const PORT = 5000;
-const JWT_SECRET = "supersecretkey";
+const PORT = process.env.PORT || 5000;
+const JWT_SECRET = "supersecretkey"; // we will move this to .env later
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-// ✅ Connect to MongoDB Atlas
-const uri = "mongodb+srv://hinterest1:M1DxqiRIpYyt4KLJ@hinterest-cluster.5eafkyj.mongodb.net/?retryWrites=true&w=majority&appName=hinterest-cluster";
-mongoose.connect(uri)
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/hinterest', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log("✅ Connected to MongoDB"))
+.catch((err) => console.error("❌ MongoDB connection error:", err));
 
-// ✅ Register route
+// Register route
 app.post('/api/register', async (req, res) => {
-  console.log("Register request received with body:", req.body);
   const { email, password } = req.body;
 
   try {
@@ -38,7 +45,7 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// ✅ Login route
+// Login route
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
 
@@ -57,14 +64,17 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// ✅ Mount subject routes (includes /api/subjects GET and POST)
-app.use(subjectRoutes);
+// Routes
+app.use('/api/subjects', subjectRoutes);
+app.use('/api/notes', notesRoutes);
+app.use('/api/quizzes', quizzesRoutes);
+app.use('/api/flashcards', flashcardsRoutes);
 
-// ✅ Test routes
+// Test routes
 app.get('/', (req, res) => res.send('Hinterest backend is working!'));
 app.get('/api/test', (req, res) => res.send('API test works!'));
 
-// ✅ Start server (only once)
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server is running on http://localhost:${PORT}`);
 });
