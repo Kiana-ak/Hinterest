@@ -6,10 +6,14 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('./user');
 const subjectRoutes = require('./subjects'); // ✅ This already handles all /api/subjects routes
+const flashcardRoutes = require('./routes/flashcards');
+const noteRoutes = require('./routes/notes');
+const quizRoutes = require('./routes/quizzes');
+require('dotenv').config();
 
 const app = express();
 const PORT = 5000;
-const JWT_SECRET = "supersecretkey";
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware
 app.use(cors());
@@ -58,7 +62,11 @@ app.post('/api/login', async (req, res) => {
 });
 
 // ✅ Mount subject routes (includes /api/subjects GET and POST)
-app.use(subjectRoutes);
+app.use('/api/subjects', subjectRoutes);
+app.use('/api/flashcards', flashcardRoutes);
+app.use('/api/notes', noteRoutes);
+app.use('/api/quizzes', quizRoutes);
+
 
 // ✅ Test routes
 app.get('/', (req, res) => res.send('Hinterest backend is working!'));

@@ -41,7 +41,7 @@ router.get('/:id', auth, async (req, res) => {
 router.post('/', auth, async (req, res) => {
   try {
     const { title, content, subjectId } = req.body;
-    
+    console.log('📩 Note create request:', req.body, 'from user:', req.user.userId);
     // Create new note
     const newNote = new Note({
       title,

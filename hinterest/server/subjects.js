@@ -17,7 +17,7 @@ function authenticateToken(req, res, next) {
   });
 }
 
-router.get('/api/subjects', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   const userId = req.user.userId;
   try {
     const subjects = await Subject.find({ userId });
@@ -28,7 +28,7 @@ router.get('/api/subjects', authenticateToken, async (req, res) => {
   }
 });
 
-router.post('/api/subjects', authenticateToken, async (req, res) => {
+router.post('/', authenticateToken, async (req, res) => {
   const { name } = req.body;
   const userId = req.user.userId;
 
@@ -46,7 +46,7 @@ router.post('/api/subjects', authenticateToken, async (req, res) => {
   }
 });
 
-router.delete('/api/subjects/:id', authenticateToken, async (req, res) => {
+router.delete('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     const userId = req.user.userId;
   
@@ -62,7 +62,7 @@ router.delete('/api/subjects/:id', authenticateToken, async (req, res) => {
     }
   });
   
-  router.put('/api/subjects/:id', authenticateToken, async (req, res) => {
+  router.put('/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
     const userId = req.user.userId;
