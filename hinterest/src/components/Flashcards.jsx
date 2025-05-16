@@ -1,11 +1,38 @@
 import React, { useState, useEffect } from 'react';
 
 export default function Flashcards({ subject }) {
-  const [flashcards, setFlashcards] = useState(() => {
-    // Load from localStorage if exists
-    const saved = localStorage.getItem(`flashcards-${subject}`);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [flashcards, setFlashcards] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchFlashcards = async () => {
+      if (!subject) return;
+      setLoading(true);
+      try {
+        const token = localStorage.getItem('token');
+        const response = await fetch(`http://localhost:5000/api/flashcards/subject/${subject}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch flashcards');
+        }
+        const data = await response.json();
+        setFlashcards(data);
+      } catch (err) {
+        console.error('Error loading flashcards:', err);
+        setError('Could not load flashcards');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFlashcards();
+  }, [subject]);
+
+
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -14,28 +41,62 @@ export default function Flashcards({ subject }) {
   const [editQuestion, setEditQuestion] = useState('');
   const [editAnswer, setEditAnswer] = useState('');
 
-  useEffect(() => {
-    localStorage.setItem(`flashcards-${subject}`, JSON.stringify(flashcards));
-  }, [flashcards, subject]);
+  const addCard = async () => {
+  if (!question.trim() || !answer.trim()) return;
 
-  const addCard = () => {
-    if (question.trim() && answer.trim()) {
-      setFlashcards([...flashcards, { question, answer }]);
-      setQuestion('');
-      setAnswer('');
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch('http://localhost:5000/api/flashcards', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        term: question,
+        description: answer,
+        subjectId: subject
+      })
+    });
+
+    if (!response.ok) throw new Error('Failed to create flashcard');
+
+    const newCard = await response.json();
+    setFlashcards([newCard, ...flashcards]);
+    setQuestion('');
+    setAnswer('');
+  } catch (err) {
+    console.error('Error creating flashcard:', err);
+    setError('Failed to create flashcard');
+  }
+};
+
+
+  const deleteCard = async (cardId) => {
+  if (!window.confirm('Are you sure you want to delete this flashcard?')) return;
+
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:5000/api/flashcards/${cardId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete flashcard');
     }
-  };
 
-  const deleteCard = (index) => {
-    const updated = [...flashcards];
-    updated.splice(index, 1);
-    setFlashcards(updated);
-    
-    // Adjust current card index if needed
-    if (index <= currentCardIndex && currentCardIndex > 0) {
+    setFlashcards(flashcards.filter((card) => card._id !== cardId));
+    if (currentCardIndex >= flashcards.length - 1 && currentCardIndex > 0) {
       setCurrentCardIndex(currentCardIndex - 1);
     }
-  };
+  } catch (err) {
+    console.error('Error deleting flashcard:', err);
+    alert('Error deleting flashcard');
+  }
+};
 
   const flipCard = () => {
     setIsFlipped(!isFlipped);
@@ -57,21 +118,41 @@ export default function Flashcards({ subject }) {
 
   const startEditing = (index) => {
     setEditingIndex(index);
-    setEditQuestion(flashcards[index].question);
-    setEditAnswer(flashcards[index].answer);
+    setEditQuestion(flashcards[index].term);
+    setEditAnswer(flashcards[index].description);
   };
 
-  const saveEdit = (index) => {
-    if (editQuestion.trim() && editAnswer.trim()) {
-      const updatedCards = [...flashcards];
-      updatedCards[index] = {
-        question: editQuestion,
-        answer: editAnswer
-      };
-      setFlashcards(updatedCards);
-      setEditingIndex(null);
-    }
-  };
+  const saveEdit = async (index) => {
+  const card = flashcards[index];
+  if (!editQuestion.trim() || !editAnswer.trim()) return;
+
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`http://localhost:5000/api/flashcards/${card._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        term: editQuestion,
+        description: editAnswer
+      })
+    });
+
+    if (!response.ok) throw new Error('Failed to update flashcard');
+
+    const updatedCard = await response.json();
+    const updatedCards = [...flashcards];
+    updatedCards[index] = updatedCard;
+    setFlashcards(updatedCards);
+    setEditingIndex(null);
+  } catch (err) {
+    console.error('Error updating flashcard:', err);
+    setError('Failed to update flashcard');
+  }
+};
+
 
   const cancelEdit = () => {
     setEditingIndex(null);
@@ -89,14 +170,14 @@ export default function Flashcards({ subject }) {
           value={question}
           placeholder="Question"
           onChange={(e) => setQuestion(e.target.value)}
-          style={{ width: '100%', marginBottom: '0.5rem' }}
+          style={{ width: '98%', marginBottom: '0.5rem' }}
         />
         <textarea
           value={answer}
           placeholder="Answer"
           onChange={(e) => setAnswer(e.target.value)}
           rows={3}
-          style={{ width: '100%' }}
+          style={{ width: '98%' }}
         />
         <button 
           onClick={addCard} 
@@ -122,7 +203,7 @@ export default function Flashcards({ subject }) {
           <div 
             onClick={flipCard}
             style={{ 
-              width: '100%',
+              width: '98%',
               height: '200px',
               perspective: '1000px',
               marginBottom: '2rem', /* Increased margin to create more space */
@@ -131,7 +212,7 @@ export default function Flashcards({ subject }) {
           >
             <div style={{
               position: 'relative',
-              width: '100%',
+              width: '98%',
               height: '100%',
               textAlign: 'center',
               transition: 'transform 0.6s',
@@ -143,7 +224,7 @@ export default function Flashcards({ subject }) {
               {/* Front of card (Question) */}
               <div style={{
                 position: 'absolute',
-                width: '100%',
+                width: '98%',
                 height: '100%',
                 backfaceVisibility: 'hidden',
                 backgroundColor: '#f8f8f8',
@@ -155,7 +236,7 @@ export default function Flashcards({ subject }) {
               }}>
                 <div>
                   <h4>Question:</h4>
-                  <p>{flashcards[currentCardIndex]?.question}</p>
+                  <p>{flashcards[currentCardIndex]?.term}</p>
                   <p style={{ fontSize: '0.8rem', marginTop: '1rem', color: '#666' }}>
                     (Click to flip)
                   </p>
@@ -165,10 +246,10 @@ export default function Flashcards({ subject }) {
               {/* Back of card (Answer) */}
               <div style={{
                 position: 'absolute',
-                width: '100%',
+                width: '98%',
                 height: '100%',
                 backfaceVisibility: 'hidden',
-                backgroundColor: '#e8f4ff',
+                backgroundColor: '#99ffbb',
                 transform: 'rotateY(180deg)',
                 display: 'flex',
                 alignItems: 'center',
@@ -178,7 +259,7 @@ export default function Flashcards({ subject }) {
               }}>
                 <div>
                   <h4>Answer:</h4>
-                  <p>{flashcards[currentCardIndex]?.answer}</p>
+                  <p>{flashcards[currentCardIndex]?.description}</p>
                   <p style={{ fontSize: '0.8rem', marginTop: '1rem', color: '#666' }}>
                     (Click to flip)
                   </p>
@@ -245,7 +326,7 @@ export default function Flashcards({ subject }) {
                       value={editQuestion}
                       onChange={(e) => setEditQuestion(e.target.value)}
                       style={{ 
-                        width: '100%', 
+                        width: '98%', 
                         marginBottom: '0.5rem',
                         padding: '0.25rem'
                       }}
@@ -254,7 +335,7 @@ export default function Flashcards({ subject }) {
                       value={editAnswer}
                       onChange={(e) => setEditAnswer(e.target.value)}
                       style={{ 
-                        width: '100%', 
+                        width: '98%', 
                         marginBottom: '0.5rem',
                         padding: '0.25rem'
                       }}
@@ -291,8 +372,10 @@ export default function Flashcards({ subject }) {
                   </div>
                 ) : (
                   <>
-                    <strong>Q:</strong> {card.question.substring(0, 30)}{card.question.length > 30 ? '...' : ''}<br />
-                    <strong>A:</strong> {card.answer.substring(0, 30)}{card.answer.length > 30 ? '...' : ''}<br />
+                    <strong>Q:</strong> {card.term?.substring(0, 30) || 'Untitled'}{card.term && card.term.length > 30 ? '...' : ''}<br />
+<strong>A:</strong> {card.description?.substring(0, 30) || 'No description'}{card.description && card.description.length > 30 ? '...' : ''}<br />
+
+
                     <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
                       <button 
                         onClick={() => setCurrentCardIndex(idx)}
@@ -321,7 +404,7 @@ export default function Flashcards({ subject }) {
                         Edit
                       </button>
                       <button 
-                        onClick={() => deleteCard(idx)}
+                        onClick={() => deleteCard(card._id)}
                         style={{
                           backgroundColor: '#F44336',
                           color: 'white',

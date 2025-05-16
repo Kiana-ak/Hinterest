@@ -41,7 +41,8 @@ router.get('/:id', auth, async (req, res) => {
 router.post('/', auth, async (req, res) => {
   try {
     const { term, description, subjectId } = req.body;
-    
+    console.log('🟡 Creating flashcard:', req.body);
+
     // Create new flashcard
     const newFlashcard = new Flashcard({
       term,
