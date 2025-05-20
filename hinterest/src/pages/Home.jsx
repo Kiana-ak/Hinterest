@@ -75,17 +75,31 @@ function Home() {
 
   {/* Main Content */}
   <div style={{ flex: 1, padding: '1.5rem' }}>
-    {selectedSubject ? (
-      <>
-        {selectedTool === 'chatbot' && <Chatbot subject={selectedSubject} />}
-        {selectedTool === 'flashcards' && <Flashcards subject={selectedSubject} />}
-        {selectedTool === 'notes' && <Notes subject={selectedSubject} />}
-        {selectedTool === 'quizzes' && <Quizzes subject={selectedSubject} />}
-      </>
-    ) : (
-      <p style={{ color: 'white' }}>Please select or add a subject to begin.</p>
-    )}
-  </div>
+  {subjects.length > 0 && !selectedSubject ? (
+    <div style={{ 
+      display: 'flex', 
+      flexDirection: 'column', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      height: '100%' 
+    }}>
+      <img src="/logo.png" alt="App Logo" style={{ width: '180px', opacity: 0.9 }} />
+      <p style={{ color: '#555', marginTop: '1rem' }}>
+        Please add or select a subject to begin.
+      </p>
+    </div>
+  ) : selectedSubject ? (
+    <>
+      {selectedTool === 'chatbot' && <Chatbot subject={selectedSubject} />}
+      {selectedTool === 'flashcards' && <Flashcards subject={selectedSubject} />}
+      {selectedTool === 'notes' && <Notes subject={selectedSubject} />}
+      {selectedTool === 'quizzes' && <Quizzes subject={selectedSubject} />}
+    </>
+  ) : (
+    <p style={{ color: 'white' }}>Loading...</p>
+  )}
+</div>
+
 
   {/* Right Sidebar */}
   {showRightSidebar && (

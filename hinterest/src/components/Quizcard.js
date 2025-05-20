@@ -430,23 +430,6 @@ function Quizcard({ subject }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        
-        {/* Navigation button to Chatbot */}
-        <button 
-          onClick={navigateToChatbot}
-          style={{ 
-            padding: '0.5rem 1rem',
-            backgroundColor: '#4285f4',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
-          }}
-        >
-          Switch to Chatbot
-        </button>
-      </div>
       
       {error && <p style={{ color: 'red' }}>{error}</p>}
       
