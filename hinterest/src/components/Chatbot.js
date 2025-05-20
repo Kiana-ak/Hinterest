@@ -172,7 +172,7 @@ function Chatbot({ subject }) {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '90vh' }}>
       {/* Subject Title */}
-      <h2 style={{ marginBottom: '1rem' }}>Chat with {subjectName}</h2>
+      <h2 style={{ marginBottom: '1rem', display: 'none' }}>Chat with {subjectName}</h2>
       
       {/* Clear Chat Button */}
       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.5rem' }}>

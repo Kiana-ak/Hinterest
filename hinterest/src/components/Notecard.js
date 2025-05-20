@@ -175,7 +175,6 @@ function Notecard({ subject }) {
 
   return (
     <div>
-      <h2>Notes for {subjectName}</h2>
       
       {error && <p style={{ color: 'red' }}>{error}</p>}
       

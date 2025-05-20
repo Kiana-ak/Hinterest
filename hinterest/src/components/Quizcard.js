@@ -431,7 +431,6 @@ function Quizcard({ subject }) {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-        <h2>Quizzes for {subjectName}</h2>
         
         {/* Navigation button to Chatbot */}
         <button 

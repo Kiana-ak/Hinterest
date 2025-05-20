@@ -162,7 +162,7 @@ export default function Flashcards({ subject }) {
 
   return (
     <div>
-      <h3>{subject} Flashcards</h3>
+      
 
       <div style={{ marginBottom: '1rem' }}>
         <input
