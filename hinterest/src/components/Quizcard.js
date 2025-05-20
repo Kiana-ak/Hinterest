@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getGeminiResponse } from '../services/GeminiService';
 
 function Quizcard({ subject }) {
   const navigate = useNavigate(); // Initialize navigate function
@@ -391,6 +392,42 @@ function Quizcard({ subject }) {
     setTakingQuiz(false);
   };
 
+  //AI generated quizz
+  const handleGenerateQuizWithAI = async () => {
+  try {
+    const aiText = await getGeminiResponse([
+      { sender: 'user', text: `Generate a quiz based on this topic: ${description}. Return only a JSON object with this format:
+{
+  "title": "Your Quiz Title",
+  "questions": [
+    {
+      "text": "Question text",
+      "options": [
+        { "text": "Option 1", "isCorrect": false },
+        { "text": "Option 2", "isCorrect": true }
+      ],
+      "explanation": "Explanation text"
+    }
+  ]
+}` }
+    ], subject);
+
+    //  Strip backticks and parse clean JSON
+    const cleanJSON = aiText.replace(/```json|```/g, '').trim();
+    const quizJSON = JSON.parse(cleanJSON);
+
+    // Set fields with AI-generated data
+    setTitle(quizJSON.title || '');
+    setQuestions(quizJSON.questions || []);
+    setShowQuizForm(true); // Show the form with prefilled values
+    setError('');
+  } catch (err) {
+    console.error('Error generating quiz with AI:', err);
+    setError('AI could not generate the quiz. Please try a simpler description.');
+  }
+};
+
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
@@ -525,7 +562,7 @@ function Quizcard({ subject }) {
           
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem' }}>
-              Description (optional):
+              Description(Required):
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -540,6 +577,23 @@ function Quizcard({ subject }) {
               />
             </label>
           </div>
+
+          {/* AI Button for quiz generation */}
+<button 
+  type="button"
+  onClick={handleGenerateQuizWithAI}
+  style={{ 
+    padding: '0.5rem 1rem',
+    backgroundColor: '#34a853',
+    color: 'white',
+    border: 'none',
+    borderRadius: '4px',
+    marginBottom: '1rem'
+  }}
+>
+  Generate Quiz with AI
+</button>
+
           
           <h3>Questions</h3>
           
@@ -803,6 +857,21 @@ function Quizcard({ subject }) {
               </button>
             </div>
           )}
+
+              <button 
+      onClick={handleGenerateQuizWithAI}
+      style={{ 
+        padding: '0.5rem 1rem',
+        backgroundColor: '#34a853',
+        color: 'white',
+        border: 'none',
+        borderRadius: '4px',
+        marginLeft: '0.5rem'
+      }}
+    >
+      Generate Quiz with AI
+    </button>
+
           
           {loading ? (
             <p>Loading quizzes...</p>
