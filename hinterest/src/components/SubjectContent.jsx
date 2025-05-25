@@ -43,10 +43,24 @@ const SubjectContent = ({ subject }) => {
             backgroundColor: '#dc3545',
             color: 'white',
             textDecoration: 'none',
-            borderRadius: '4px'
+            borderRadius: '4px',
+            marginRight: '10px'
           }}
         >
           Take Quiz
+        </Link>
+        <Link 
+          to="/whiteboard" 
+          style={{
+            display: 'inline-block',
+            padding: '8px 16px',
+            backgroundColor: '#6610f2',
+            color: 'white',
+            textDecoration: 'none',
+            borderRadius: '4px'
+          }}
+        >
+          Whiteboard
         </Link>
       </div>
 

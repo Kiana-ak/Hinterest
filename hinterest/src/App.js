@@ -5,7 +5,8 @@ import CalendarLogin from './pages/CalendarLogin';
 import CalendarPage from './pages/CalendarPage';
 import NotePage from './components/NotePage';
 import FlashcardsPage from './pages/FlashcardsPage';
-import QuizzesPage from './pages/QuizzesPage';  // Update this import
+import QuizzesPage from './pages/QuizzesPage';
+import WhiteboardPage from './pages/WhiteboardPage';  // Add this import
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/notes" element={<NotePage />} />
           <Route path="/flashcards" element={<FlashcardsPage />} />
           <Route path="/quizzes" element={<QuizzesPage />} />
+          <Route path="/whiteboard" element={<WhiteboardPage />} />  {/* Add this route */}
         </Routes>
       </div>
     </Router>
