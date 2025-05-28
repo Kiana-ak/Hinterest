@@ -2,18 +2,15 @@ import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import '../styles/ChatBox.css';
 
-const socket = io('http://localhost:5000');
+const socket = io('http://localhost:5500'); 
 
 function ChatBox() {
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState({}); // keyed by chatId
-  
-  //example
+  const [messages, setMessages] = useState({});
   const [selectedChat, setSelectedChat] = useState('General > Alice');
 
   const oneOnOneChats = ['Alice', 'Bob'];
   const groupChats = ['Study Group', 'Math Team'];
-  //examples
 
   useEffect(() => {
     socket.on('receive_message', ({ chatId, text }) => {
@@ -27,6 +24,23 @@ function ChatBox() {
       socket.off('receive_message');
     };
   }, []);
+
+  useEffect(() => {
+    const loadHistory = async () => {
+      try {
+        const res = await fetch(`http://localhost:5500/messages/${encodeURIComponent(selectedChat)}`);
+        const data = await res.json();
+        setMessages(prev => ({
+          ...prev,
+          [selectedChat]: data.map(entry => entry.text)
+        }));
+      } catch (err) {
+        console.error('Failed to load chat history:', err);
+      }
+    };
+
+    loadHistory();
+  }, [selectedChat]);
 
   const handleSend = () => {
     if (!message.trim()) return;
@@ -46,6 +60,7 @@ function ChatBox() {
     <div className="chatbox-wrapper">
       <div className="chatbox-sidebar">
         <h4>Chats</h4>
+
         <div className="chat-category">
           <strong>General</strong>
           <ul>
