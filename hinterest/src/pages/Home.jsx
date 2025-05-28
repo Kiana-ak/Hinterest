@@ -6,6 +6,7 @@ import Chatbot from '../components/Chatbot';
 import Flashcards from '../components/Flashcards';
 import Notes from '../components/Notecard'; // Use your actual Notes component name
 import Quizzes from '../components/Quizcard'; // Use your actual Quizzes component name
+import ChatBox from '../components/ChatBox';
 
 function Home() {
   const [message, setMessage] = useState('Loading...');
@@ -46,13 +47,14 @@ function Home() {
     <div style={{ display: 'flex', height: 'calc(100vh - 60px)' }}>
   {/* Left Sidebar */}
   {showLeftSidebar && (
-  <div style={{ width: '200px', background: '#ffffcc', padding: '1rem' }}>
+  <div style={{ width: '220px', background: '#ffffcc', padding: '1rem' }}>
     <button onClick={() => setShowLeftSidebar(false)} style={{ marginBottom: '0.5rem' }}>☰</button>
 
     <h3>Menu</h3>
     <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
       <li><Link to="/home">Home</Link></li>
       <li><Link to="/calendar-login">Calendar</Link></li>
+      <li onClick={() => setSelectedTool('chatbox')}>Chats</li>
       <li><Link to="/">Logout</Link></li>
     </ul>
     <hr />
@@ -75,31 +77,19 @@ function Home() {
 
   {/* Main Content */}
   <div style={{ flex: 1, padding: '1.5rem' }}>
-  {subjects.length > 0 && !selectedSubject ? (
-    <div style={{ 
-      display: 'flex', 
-      flexDirection: 'column', 
-      alignItems: 'center', 
-      justifyContent: 'center', 
-      height: '100%' 
-    }}>
-      <img src="/logo.png" alt="App Logo" style={{ width: '180px', opacity: 0.9 }} />
-      <p style={{ color: '#555', marginTop: '1rem' }}>
-        Please add or select a subject to begin.
-      </p>
-    </div>
-  ) : selectedSubject ? (
     <>
-      {selectedTool === 'chatbot' && <Chatbot subject={selectedSubject} />}
-      {selectedTool === 'flashcards' && <Flashcards subject={selectedSubject} />}
-      {selectedTool === 'notes' && <Notes subject={selectedSubject} />}
-      {selectedTool === 'quizzes' && <Quizzes subject={selectedSubject} />}
-    </>
-  ) : (
-    <p style={{ color: 'white' }}>Loading...</p>
-  )}
-</div>
+      {selectedTool === 'chatbot' && selectedSubject && <Chatbot subject={selectedSubject} />}
+      {selectedTool === 'flashcards' && selectedSubject && <Flashcards subject={selectedSubject} />}
+      {selectedTool === 'notes' && selectedSubject && <Notes subject={selectedSubject} />}
+      {selectedTool === 'quizzes' && selectedSubject && <Quizzes subject={selectedSubject} />}
+      {selectedTool === 'chatbox' && <ChatBox />}
 
+      {!selectedSubject && selectedTool !== 'chatbox' && (
+        <p style={{ color: 'white' }}>Please select or add a subject to begin.</p>
+      )}
+</>
+
+  </div>
 
   {/* Right Sidebar */}
   {showRightSidebar && (
