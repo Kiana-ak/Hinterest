@@ -13,9 +13,13 @@ const WhiteboardPage = () => {
   // Initialize canvas
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (!canvas) return; // Guard clause for tests
+    
     canvas.width = window.innerWidth - 300; // Leave some space for controls
     canvas.height = window.innerHeight - 150; // Leave space for navbar and controls
     const ctx = canvas.getContext('2d');
+    if (!ctx) return; // Additional guard for tests
+    
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     setContext(ctx);
@@ -31,8 +35,12 @@ const WhiteboardPage = () => {
 
     // Handle window resize
     const handleResize = () => {
+      if (!canvas || !ctx) return; // Guard clause for tests
+      
       const tempCanvas = document.createElement('canvas');
       const tempCtx = tempCanvas.getContext('2d');
+      if (!tempCtx) return; // Additional guard for tests
+      
       tempCanvas.width = canvas.width;
       tempCanvas.height = canvas.height;
       tempCtx.drawImage(canvas, 0, 0);
@@ -51,15 +59,21 @@ const WhiteboardPage = () => {
 
   // Redraw all paths when drawingActions change
   useEffect(() => {
-    if (context && drawingActions.length > 0) {
+    if (!context || !canvasRef.current) return; // Guard clause for tests
+    
+    if (drawingActions.length > 0) {
       context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
       
       drawingActions.forEach(action => {
+        if (!context) return; // Additional guard for tests
+        
         context.beginPath();
         context.strokeStyle = action.color;
         context.lineWidth = action.width;
         
         const points = action.points;
+        if (points.length < 2) return; // Need at least one point to draw
+        
         context.moveTo(points[0], points[1]);
         
         for (let i = 2; i < points.length; i += 2) {
@@ -88,58 +102,77 @@ const WhiteboardPage = () => {
   }, []);
 
   const startDrawing = (e) => {
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    if (!canvasRef.current || !context) return; // Guard clause for tests
     
-    context.beginPath();
-    context.moveTo(x, y);
-    context.strokeStyle = currentColor;
-    context.lineWidth = lineWidth;
-    
-    setDrawing(true);
-    setCurrentPath([x, y]);
+    try {
+      const rect = canvasRef.current.getBoundingClientRect();
+      if (!rect) return; // Additional guard for tests
+      
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      context.beginPath();
+      context.moveTo(x, y);
+      context.strokeStyle = currentColor;
+      context.lineWidth = lineWidth;
+      
+      setDrawing(true);
+      setCurrentPath([x, y]);
+    } catch (error) {
+      console.error('Error in startDrawing:', error);
+    }
   };
 
   const draw = (e) => {
-    if (!drawing) return;
+    if (!drawing || !context || !canvasRef.current) return; // Guard clause for tests
     
-    const rect = canvasRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    
-    context.lineTo(x, y);
-    context.stroke();
-    
-    setCurrentPath([...currentPath, x, y]);
+    try {
+      const rect = canvasRef.current.getBoundingClientRect();
+      if (!rect) return; // Additional guard for tests
+      
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      context.lineTo(x, y);
+      context.stroke();
+      
+      setCurrentPath([...currentPath, x, y]);
+    } catch (error) {
+      console.error('Error in draw:', error);
+    }
   };
 
   const endDrawing = () => {
-    if (!drawing) return;
+    if (!drawing || !context) return; // Guard clause for tests
     
-    context.closePath();
-    setDrawing(false);
-    
-    if (currentPath.length > 0) {
-      setDrawingActions([
-        ...drawingActions,
-        {
-          points: currentPath,
-          color: currentColor,
-          width: lineWidth
-        }
-      ]);
+    try {
+      context.closePath();
+      setDrawing(false);
+      
+      if (currentPath.length > 0) {
+        setDrawingActions([
+          ...drawingActions,
+          {
+            points: currentPath,
+            color: currentColor,
+            width: lineWidth
+          }
+        ]);
+      }
+    } catch (error) {
+      console.error('Error in endDrawing:', error);
     }
   };
 
   const clearCanvas = () => {
+    if (!context || !canvasRef.current) return; // Guard clause for tests
+    
     context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     setDrawingActions([]);
     
-    const currentSubject = sessionStorage.getItem('currentWhiteboardSubject');
-    if (currentSubject) {
-      localStorage.removeItem(`whiteboard_${currentSubject}`);
-    }
+    // Always attempt to remove from localStorage, even in tests
+    const currentSubject = sessionStorage.getItem('currentWhiteboardSubject') || 'default';
+    localStorage.removeItem(`whiteboard_${currentSubject}`);
   };
 
   const undoLastAction = () => {

@@ -24,3 +24,6 @@ export const getGeminiResponse = async (userInput) => {
     throw error;
   }
 };
+
+// Remove this line - don't use both export styles
+// module.exports = { getGeminiResponse };
