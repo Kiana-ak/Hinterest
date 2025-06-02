@@ -34,6 +34,7 @@ function Login() {
         }
 
         localStorage.setItem('token', data.token);
+        localStorage.setItem('email', data.email); // ✅ Store logged-in email for chat system
         navigate('/home');
       } catch (error) {
         setError(error.message);
@@ -63,6 +64,7 @@ function Login() {
         setError(''); // Clear any existing errors
         setMessage('Registration successful!');
         localStorage.setItem('token', data.token);
+        localStorage.setItem('email', data.email); // ✅ Store registered email for chat system
         navigate('/home');
       } catch (error) {
         setError(error.message || 'Server error. Please try again later.');
@@ -113,7 +115,7 @@ function Login() {
         {/* Display both error and message */}
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <p style={{ color: isLogin ? 'gray' : 'green' }}>{message}</p>
-  
+
         <div style={{ marginTop: '1rem' }}>
           {isLogin ? (
             <p>

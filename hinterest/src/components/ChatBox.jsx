@@ -2,15 +2,16 @@ import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import '../styles/ChatBox.css';
 
-const socket = io('http://localhost:5500'); 
+const socket = io('http://localhost:5500');
 
 function ChatBox() {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState({});
-  const [selectedChat, setSelectedChat] = useState('General > Alice');
-
-  const oneOnOneChats = ['Alice', 'Bob'];
-  const groupChats = ['Study Group', 'Math Team'];
+  const [selectedChat, setSelectedChat] = useState('');
+  const [oneOnOneChats, setOneOnOneChats] = useState(['Alice', 'Bob']);
+  const [groupChats, setGroupChats] = useState(['Study Group', 'Math Team']);
+  const [newChatName, setNewChatName] = useState('');
+  const [newChatType, setNewChatType] = useState('General'); // or 'Group'
 
   useEffect(() => {
     socket.on('receive_message', ({ chatId, text }) => {
@@ -27,6 +28,7 @@ function ChatBox() {
 
   useEffect(() => {
     const loadHistory = async () => {
+      if (!selectedChat) return;
       try {
         const res = await fetch(`http://localhost:5500/messages/${encodeURIComponent(selectedChat)}`);
         const data = await res.json();
@@ -43,7 +45,7 @@ function ChatBox() {
   }, [selectedChat]);
 
   const handleSend = () => {
-    if (!message.trim()) return;
+    if (!message.trim() || !selectedChat) return;
     socket.emit('send_message', { chatId: selectedChat, text: `You: ${message}` });
     setMessages(prev => ({
       ...prev,
@@ -54,6 +56,19 @@ function ChatBox() {
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') handleSend();
+  };
+
+  const handleAddChat = () => {
+    if (!newChatName.trim()) return;
+
+    const formattedChatId = `${newChatType} > ${newChatName}`;
+    if (newChatType === 'General') {
+      setOneOnOneChats(prev => [...new Set([...prev, newChatName])]);
+    } else {
+      setGroupChats(prev => [...new Set([...prev, newChatName])]);
+    }
+    setSelectedChat(formattedChatId);
+    setNewChatName('');
   };
 
   return (
@@ -89,6 +104,20 @@ function ChatBox() {
               </li>
             ))}
           </ul>
+        </div>
+
+        <div className="chat-new">
+          <select value={newChatType} onChange={(e) => setNewChatType(e.target.value)}>
+            <option value="General">General (1-on-1)</option>
+            <option value="Group">Group</option>
+          </select>
+          <input
+            type="text"
+            placeholder="New chat name"
+            value={newChatName}
+            onChange={(e) => setNewChatName(e.target.value)}
+          />
+          <button onClick={handleAddChat}>Add Chat</button>
         </div>
       </div>
 
