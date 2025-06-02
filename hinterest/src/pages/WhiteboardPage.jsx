@@ -178,9 +178,20 @@ const WhiteboardPage = () => {
   const undoLastAction = () => {
     if (drawingActions.length === 0) return;
     
+    // Remove the last drawing action (like popping from a stack)
     const newDrawingActions = [...drawingActions];
     newDrawingActions.pop();
     setDrawingActions(newDrawingActions);
+    setCurrentPath([]); // Reset current path when undoing
+    
+    // Provide visual feedback about remaining actions
+    if (newDrawingActions.length === 0 && canvasRef.current && context) {
+      // Clear the canvas completely when stack is empty
+      context.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      console.log('Whiteboard is now empty');
+    } else {
+      console.log(`Removed last line. ${newDrawingActions.length} drawing actions remaining`);
+    }
   };
 
   return (
