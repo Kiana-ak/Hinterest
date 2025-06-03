@@ -48,7 +48,7 @@ function Quizcard({ subject }) {
         const fetchSubjectName = async () => {
           try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/subjects/${subject}`, {
+            const response = await fetch(`http://localhost:8080/api/subjects/${subject}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -79,7 +79,7 @@ function Quizcard({ subject }) {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/quizzes/subject/${subject}`, {
+        const response = await fetch(`http://localhost:8080/api/quizzes/subject/${subject}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -220,8 +220,8 @@ function Quizcard({ subject }) {
     try {
       const token = localStorage.getItem('token');
       const url = currentQuiz 
-        ? `http://localhost:5000/api/quizzes/${currentQuiz._id}`
-        : 'http://localhost:5000/api/quizzes';
+        ? `http://localhost:8080/api/quizzes/${currentQuiz._id}`
+        : 'http://localhost:8080/api/quizzes';
       
       const method = currentQuiz ? 'PUT' : 'POST';
       
@@ -281,7 +281,7 @@ function Quizcard({ subject }) {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/quizzes/${quizId}`, {
+      const response = await fetch(`http://localhost:8080/api/quizzes/${quizId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

@@ -11,7 +11,7 @@ export default function Flashcards({ subject }) {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/flashcards/subject/${subject}`, {
+        const response = await fetch(`http://localhost:8080/api/flashcards/subject/${subject}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -46,7 +46,7 @@ export default function Flashcards({ subject }) {
 
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('http://localhost:5000/api/flashcards', {
+    const response = await fetch('http://localhost:8080/api/flashcards', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -77,7 +77,7 @@ export default function Flashcards({ subject }) {
 
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:5000/api/flashcards/${cardId}`, {
+    const response = await fetch(`http://localhost:8080/api/flashcards/${cardId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -128,7 +128,7 @@ export default function Flashcards({ subject }) {
 
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`http://localhost:5000/api/flashcards/${card._id}`, {
+    const response = await fetch(`http://localhost:8080/api/flashcards/${card._id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

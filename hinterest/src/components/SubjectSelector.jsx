@@ -17,7 +17,7 @@ const [renamingSubjectName, setRenamingSubjectName] = useState('');
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/subjects', {
+      const response = await fetch('http://localhost:8080/api/subjects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const [renamingSubjectName, setRenamingSubjectName] = useState('');
   if (!window.confirm("Are you sure you want to delete this subject?")) return;
 
   try {
-    const response = await fetch(`http://localhost:5000/api/subjects/${id}`, {
+    const response = await fetch(`http://localhost:8080/api/subjects/${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
@@ -98,7 +98,7 @@ const handleRenameSubject = async (e, id, currentName) => {
   }
 
   try {
-    const response = await fetch(`http://localhost:5000/api/subjects/${id}`, {
+    const response = await fetch(`http://localhost:8080/api/subjects/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ const submitRename = async (id) => {
 
   const token = localStorage.getItem('token');
   try {
-    const response = await fetch(`http://localhost:5000/api/subjects/${id}`, {
+    const response = await fetch(`http://localhost:8080/api/subjects/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',

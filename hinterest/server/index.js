@@ -13,7 +13,7 @@ require('dotenv').config();
 const chatRoutes = require('./routes/chats');
 
 const app = express();
-const PORT = 5000;
+const PORT = 8080;
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Middleware

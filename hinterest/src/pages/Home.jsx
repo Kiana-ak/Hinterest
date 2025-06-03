@@ -22,7 +22,7 @@ function Home() {
     const fetchSubjects = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/subjects', {
+        const response = await fetch('http://localhost:8080/api/subjects', {
           headers: {
             'Authorization': `Bearer ${token}`
           }

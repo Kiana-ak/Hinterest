@@ -17,7 +17,7 @@ function ChatBox() {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/chats');
+        const res = await fetch('http://localhost:8080/api/chats');
         const data = await res.json();
         const oneOnOne = data.filter(chat => chat.type === 'General').map(chat => chat.name);
         const group = data.filter(chat => chat.type === 'Group').map(chat => chat.name);
@@ -96,7 +96,7 @@ function ChatBox() {
 
     try {
       // ✅ Save chat to MongoDB
-      await fetch('http://localhost:5000/api/chats', {
+      await fetch('http://localhost:8080/api/chats', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newChatName, type: newChatType })

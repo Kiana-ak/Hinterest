@@ -17,7 +17,7 @@ function AddSubjectPage() {
         return;
       }
       
-      const response = await fetch('http://localhost:5000/api/subjects', {
+      const response = await fetch('http://localhost:8080/api/subjects', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

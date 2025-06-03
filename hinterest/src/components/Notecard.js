@@ -22,7 +22,7 @@ function Notecard({ subject }) {
         const fetchSubjectName = async () => {
           try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/api/subjects/${subject}`, {
+            const response = await fetch(`http://localhost:8080/api/subjects/${subject}`, {
               headers: {
                 'Authorization': `Bearer ${token}`
               }
@@ -53,7 +53,7 @@ function Notecard({ subject }) {
       setLoading(true);
       try {
         const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:5000/api/notes/subject/${subject}`, {
+        const response = await fetch(`http://localhost:8080/api/notes/subject/${subject}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -88,8 +88,8 @@ function Notecard({ subject }) {
     try {
       const token = localStorage.getItem('token');
       const url = editingNote 
-        ? `http://localhost:5000/api/notes/${editingNote._id}`
-        : 'http://localhost:5000/api/notes';
+        ? `http://localhost:8080/api/notes/${editingNote._id}`
+        : 'http://localhost:8080/api/notes';
       
       const method = editingNote ? 'PUT' : 'POST';
       
@@ -146,7 +146,7 @@ function Notecard({ subject }) {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/notes/${noteId}`, {
+      const response = await fetch(`http://localhost:8080/api/notes/${noteId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

@@ -19,7 +19,7 @@ function SubjectPage() {
     // Fetch subject details
     const fetchSubject = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/subjects/${subjectId}`, {
+        const response = await fetch(`http://localhost:8080/api/subjects/${subjectId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
