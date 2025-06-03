@@ -6,6 +6,7 @@ import Chatbot from '../components/Chatbot';
 import Flashcards from '../components/Flashcards';
 import Notes from '../components/Notecard'; // Use your actual Notes component name
 import Quizzes from '../components/Quizcard'; // Use your actual Quizzes component name
+import ChatBox from '../components/ChatBox';
 
 function Home() {
   const [message, setMessage] = useState('Loading...');
@@ -53,6 +54,7 @@ function Home() {
     <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
       <li><Link to="/home">Home</Link></li>
       <li><Link to="/calendar-login">Calendar</Link></li>
+      <li onClick={() => setSelectedTool('chatbox')}>Chats</li>
       <li><Link to="/">Logout</Link></li>
     </ul>
     <hr />
@@ -61,9 +63,11 @@ function Home() {
       subjects={subjects}
       setSubjects={setSubjects}
       selectedSubject={selectedSubject}
-      setSelectedSubject={setSelectedSubject}
-      setSelectedTool={setSelectedTool}
-    />
+      setSelectedSubject={(subjectId) => {
+        setSelectedSubject(subjectId);
+        setSelectedTool('chatbot');
+    }}
+  />
   </div>
 )}
 
