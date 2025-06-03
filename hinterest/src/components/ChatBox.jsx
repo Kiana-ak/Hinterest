@@ -32,12 +32,25 @@ function ChatBox() {
       try {
         const res = await fetch(`http://localhost:5500/messages/${encodeURIComponent(selectedChat)}`);
         const data = await res.json();
-        setMessages(prev => ({
-          ...prev,
-          [selectedChat]: data.map(entry => entry.text)
-        }));
+
+        if (Array.isArray(data)) {
+          setMessages(prev => ({
+            ...prev,
+            [selectedChat]: data.map(entry => entry.text)
+          }));
+        } else {
+          console.error('Unexpected response (not an array):', data);
+          setMessages(prev => ({
+            ...prev,
+            [selectedChat]: []
+          }));
+        }
       } catch (err) {
         console.error('Failed to load chat history:', err);
+        setMessages(prev => ({
+          ...prev,
+          [selectedChat]: []
+        }));
       }
     };
 

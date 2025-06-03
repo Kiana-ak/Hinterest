@@ -6,6 +6,7 @@ import Chatbot from '../components/Chatbot';
 import Flashcards from '../components/Flashcards';
 import Notes from '../components/Notecard'; // Use your actual Notes component name
 import Quizzes from '../components/Quizcard'; // Use your actual Quizzes component name
+import ChatBox from '../components/ChatBox';
 
 function Home() {
   const [message, setMessage] = useState('Loading...');
@@ -53,6 +54,7 @@ function Home() {
     <ul style={{ listStyleType: 'none', paddingLeft: 0 }}>
       <li><Link to="/home">Home</Link></li>
       <li><Link to="/calendar-login">Calendar</Link></li>
+      <li onClick={() => setSelectedTool('chatbox')} style={{ cursor: 'pointer' }}>Chat</li>
       <li><Link to="/">Logout</Link></li>
     </ul>
     <hr />
@@ -75,7 +77,16 @@ function Home() {
 
   {/* Main Content */}
   <div style={{ flex: 1, padding: '1.5rem' }}>
-  {subjects.length > 0 && !selectedSubject ? (
+  {selectedTool === 'chatbox' ? (
+    <ChatBox />
+  ) : selectedSubject ? (
+    <>
+      {selectedTool === 'chatbot' && <Chatbot subject={selectedSubject} />}
+      {selectedTool === 'flashcards' && <Flashcards subject={selectedSubject} />}
+      {selectedTool === 'notes' && <Notes subject={selectedSubject} />}
+      {selectedTool === 'quizzes' && <Quizzes subject={selectedSubject} />}
+    </>
+  ) : subjects.length > 0 ? (
     <div style={{ 
       display: 'flex', 
       flexDirection: 'column', 
@@ -88,13 +99,6 @@ function Home() {
         Please add or select a subject to begin.
       </p>
     </div>
-  ) : selectedSubject ? (
-    <>
-      {selectedTool === 'chatbot' && <Chatbot subject={selectedSubject} />}
-      {selectedTool === 'flashcards' && <Flashcards subject={selectedSubject} />}
-      {selectedTool === 'notes' && <Notes subject={selectedSubject} />}
-      {selectedTool === 'quizzes' && <Quizzes subject={selectedSubject} />}
-    </>
   ) : (
     <p style={{ color: 'white' }}>Loading...</p>
   )}
