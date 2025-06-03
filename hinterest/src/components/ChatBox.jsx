@@ -8,10 +8,28 @@ function ChatBox() {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState({});
   const [selectedChat, setSelectedChat] = useState('');
-  const [oneOnOneChats, setOneOnOneChats] = useState(['Alice', 'Bob']);
-  const [groupChats, setGroupChats] = useState(['Study Group', 'Math Team']);
+  const [oneOnOneChats, setOneOnOneChats] = useState([]);
+  const [groupChats, setGroupChats] = useState([]);
   const [newChatName, setNewChatName] = useState('');
   const [newChatType, setNewChatType] = useState('General'); // or 'Group'
+
+  // ✅ Load chat list from backend
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/chats');
+        const data = await res.json();
+        const oneOnOne = data.filter(chat => chat.type === 'General').map(chat => chat.name);
+        const group = data.filter(chat => chat.type === 'Group').map(chat => chat.name);
+        setOneOnOneChats(oneOnOne);
+        setGroupChats(group);
+      } catch (err) {
+        console.error('Failed to fetch chat list:', err);
+      }
+    };
+
+    fetchChats();
+  }, []);
 
   useEffect(() => {
     socket.on('receive_message', ({ chatId, text }) => {
@@ -71,17 +89,31 @@ function ChatBox() {
     if (e.key === 'Enter') handleSend();
   };
 
-  const handleAddChat = () => {
+  const handleAddChat = async () => {
     if (!newChatName.trim()) return;
 
     const formattedChatId = `${newChatType} > ${newChatName}`;
-    if (newChatType === 'General') {
-      setOneOnOneChats(prev => [...new Set([...prev, newChatName])]);
-    } else {
-      setGroupChats(prev => [...new Set([...prev, newChatName])]);
+
+    try {
+      // ✅ Save chat to MongoDB
+      await fetch('http://localhost:5000/api/chats', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newChatName, type: newChatType })
+      });
+
+      // ✅ Update local state
+      if (newChatType === 'General') {
+        setOneOnOneChats(prev => [...new Set([...prev, newChatName])]);
+      } else {
+        setGroupChats(prev => [...new Set([...prev, newChatName])]);
+      }
+
+      setSelectedChat(formattedChatId);
+      setNewChatName('');
+    } catch (err) {
+      console.error('Failed to save new chat:', err);
     }
-    setSelectedChat(formattedChatId);
-    setNewChatName('');
   };
 
   return (

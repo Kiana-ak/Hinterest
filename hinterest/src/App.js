@@ -7,6 +7,7 @@ import SubjectPage from './pages/SubjectPage';
 import AddSubjectPage from './pages/AddSubjectPage';
 import FlashcardsPage from './pages/FlashcardsPage';
 import ChatbotPage from './pages/ChatbotPage';
+import Whiteboard from './pages/Whiteboard';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/add-subject" element={<AddSubjectPage />} />
         <Route path="/flashcards/:subjectId" element={<FlashcardsPage />} />
         <Route path="/chatbot/:subjectId" element={<ChatbotPage />} />
+        <Route path="/whiteboard" element={<Whiteboard />} />
       </Routes>
     </BrowserRouter>
   );

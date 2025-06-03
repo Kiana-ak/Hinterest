@@ -151,6 +151,19 @@ function Home() {
     >
       🧠 Quizzes
     </li>
+    <Link 
+          to="/whiteboard" 
+          style={{
+            padding: '8px',
+            margin: '4px 0',
+            backgroundColor: selectedTool === 'quizzes' ? '#fff' : 'transparent',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            color: '#000'
+      }}
+        >
+          Whiteboard
+        </Link>
   </ul>
 </div>
 

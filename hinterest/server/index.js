@@ -10,6 +10,7 @@ const flashcardRoutes = require('./routes/flashcards');
 const noteRoutes = require('./routes/notes');
 const quizRoutes = require('./routes/quizzes');
 require('dotenv').config();
+const chatRoutes = require('./routes/chats');
 
 const app = express();
 const PORT = 5000;
@@ -18,6 +19,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use('/api/chats', chatRoutes);
 
 // ✅ Connect to MongoDB Atlas
 const uri = "mongodb+srv://hinterest1:M1DxqiRIpYyt4KLJ@hinterest-cluster.5eafkyj.mongodb.net/?retryWrites=true&w=majority&appName=hinterest-cluster";
