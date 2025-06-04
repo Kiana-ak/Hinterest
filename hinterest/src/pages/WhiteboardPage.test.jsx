@@ -211,4 +211,42 @@ describe('WhiteboardPage Component', () => {
     // Check if the displayed line width was updated
     expect(screen.getByText('15px')).toBeInTheDocument();
   });
+
+  // Test for undo functionality
+  // Test 6: Undo functionality test
+  test('should remove the last drawing action when undo button is clicked', () => {
+    const { container } = render(<WhiteboardPage />);
+    
+    // Mock drawing actions state
+    // We need to simulate having drawing actions to undo
+    const mockDrawingActions = [
+      {
+        points: [10, 10, 20, 20],
+        color: '#000000',
+        width: 5
+      }
+    ];
+    
+    // Get the canvas
+    const canvas = container.querySelector('canvas');
+    
+    // Simulate drawing on the canvas
+    fireEvent.mouseDown(canvas, { clientX: 10, clientY: 10 });
+    fireEvent.mouseMove(canvas, { clientX: 20, clientY: 20 });
+    fireEvent.mouseUp(canvas);
+    
+    // Find the undo button
+    const undoButton = screen.getByText('Undo');
+    
+    // Click the undo button
+    fireEvent.click(undoButton);
+    
+    // Check if clearRect was called (which happens during redraw after undo)
+    expect(mockContext.clearRect).toHaveBeenCalled();
+    
+    // Since we're testing a state update in a React component,
+    // we should verify the effect of that state change, which is the redraw
+    // The redraw should clear the canvas and then redraw any remaining actions
+    expect(mockContext.clearRect).toHaveBeenCalledWith(0, 0, expect.any(Number), expect.any(Number));
+  });
 });
