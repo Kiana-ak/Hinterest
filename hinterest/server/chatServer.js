@@ -24,6 +24,15 @@ function generateChatId(email1, email2) {
   return [email1.toLowerCase(), email2.toLowerCase()].sort().join(':');
 }
 
+app.get('/chats/:email', async (req, res) => {
+  try {
+    const chats = await Chat.find({ participants: req.params.email });
+    res.json(chats);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch user chats' });
+  }
+});
+
 app.get('/messages/:chatId', async (req, res) => {
   try {
     const messages = await Message.find({ chatId: req.params.chatId }).sort('timestamp');
@@ -59,7 +68,7 @@ io.on('connection', (socket) => {
     const newMsg = new Message({ chatId, sender: senderEmail, text });
     await newMsg.save();
 
-    io.to(senderEmail).to(recipientEmail).emit('receive_message', {
+    socket.to(recipientEmail).emit('receive_message', {
       chatId,
       sender: senderEmail,
       text,
