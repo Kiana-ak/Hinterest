@@ -34,6 +34,7 @@ function Login() {
         }
 
         localStorage.setItem('token', data.token);
+        localStorage.setItem('userEmail', email); 
         navigate('/home');
       } catch (error) {
         setError(error.message);
@@ -63,6 +64,7 @@ function Login() {
         setError(''); // Clear any existing errors
         setMessage('Registration successful!');
         localStorage.setItem('token', data.token);
+        localStorage.setItem('userEmail', email); 
         navigate('/home');
       } catch (error) {
         setError(error.message || 'Server error. Please try again later.');

@@ -2,8 +2,7 @@ const mongoose = require('mongoose');
 
 const chatSchema = new mongoose.Schema({
   chatId: { type: String, required: true, unique: true },
-  participants: [String],
-  isGroup: { type: Boolean, default: false },
+  participants: { type: [String], required: true },
   createdAt: { type: Date, default: Date.now }
 });
 
