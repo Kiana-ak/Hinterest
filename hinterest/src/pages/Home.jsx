@@ -1,28 +1,52 @@
-import { useEffect, useState } from 'react';
-import Navbar from '../components/Navbar';
+import React from 'react';
+import './Home.css';
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
-  const [message, setMessage] = useState('Loading...');
-
-  useEffect(() => {
-    // Call Express backend at /api/test
-    fetch('http://localhost:5000/api/test')
-      .then((res) => res.text())
-      .then((data) => setMessage(data))
-      .catch((err) => {
-        console.error('Error fetching API:', err);
-        setMessage('Failed to connect to backend.');
-      });
-  }, []);
+  const navigate = useNavigate();
 
   return (
-    <div>
-      <Navbar />
-      <h2 style={{ padding: "1rem" }}>Welcome to Hinterest Dashboard</h2>
-      <p style={{ padding: "1rem" }}>Backend says: {message}</p>
+    <div className="home-container">
+      <div className="home-split">
+        {/* Left: Logo */}
+        <div className="home-left">
+          <img src="/logo.png" alt="Hinterest Logo" className="home-logo-large" />
+        </div>
+
+        {/* Right: Text + Button */}
+        <div className="home-right">
+          <h1 className="home-welcome">WELCOME</h1>
+          <p className="home-tagline">Your all-in-one academic companion.</p>
+          <p className="home-about">
+            Hinterest is a web app designed to simplify and enhance your learning journey.<br />
+            <br />
+            Use tools like AI-powered quizzes, flashcards, notes, and collaborative features to study smarter, not harder.
+          </p>
+          <button className="home-button" onClick={() => navigate('/workspace')}>
+            Go to Workspace
+          </button>
+        </div>
+      </div>
+
+      <footer style={{
+        position: 'absolute',
+        bottom: '0',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        width: '100%',
+        textAlign: 'center',
+        padding: '3rem',
+        fontSize: '1.2rem',
+        color: '#555',
+        animation: 'fadeInUp 1s ease-in-out',
+      }}>
+        <p>Need help? Contact us at <br />
+        <a href="mailto:hinterest1@gmail.com" style={{ color: '#007BFF' }}>hinterest1@gmail.com</a></p>
+      </footer>
     </div>
+
+
   );
 }
 
 export default Home;
-

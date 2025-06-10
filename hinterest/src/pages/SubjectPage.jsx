@@ -1,0 +1,148 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useSubject } from '../context/SubjectContext';
+
+function SubjectPage() {
+  const { subjectId } = useParams();
+  const [subject, setSubject] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const { setSelectedSubject } = useSubject();
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/');
+      return;
+    }
+
+    const fetchSubject = async () => {
+      try {
+        const response = await fetch(`http://localhost:8080/api/subjects/${subjectId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch subject');
+        const data = await response.json();
+        setSubject(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching subject:', error);
+        setError('Failed to load subject. Please try again.');
+        setLoading(false);
+      }
+    };
+
+    fetchSubject();
+  }, [subjectId, navigate]);
+
+  if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>;
+  if (error) return <div style={{ padding: '2rem', color: 'red', textAlign: 'center' }}>{error}</div>;
+  if (!subject) return <div style={{ padding: '2rem', textAlign: 'center' }}>Subject not found</div>;
+
+  return (
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <button 
+          onClick={() => navigate('/home')}
+          style={{ 
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            color: '#ffffff',
+            fontSize: '16px'
+          }}
+        >
+          &larr; Back to Home
+        </button>
+        <div style={{ textAlign: 'center' }}>
+          <h1 style={{ margin: 0 }}>{subject.name}</h1>
+          <button
+            onClick={() => setSelectedSubject(subject)}
+            style={{
+              marginTop: '0.5rem',
+              padding: '0.5rem 1rem',
+              fontSize: '14px',
+              backgroundColor: '#000',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer'
+            }}
+          >
+            Use This Subject
+          </button>
+        </div>
+        <div></div>
+      </div>
+
+      <div style={{ marginBottom: '2rem' }}>
+        <h3>Description</h3>
+        <p>{subject.description}</p>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '1.5rem' }}>
+        <div style={{
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          padding: '1.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          backgroundColor: '#ffffff'
+        }}>
+          <h3>Flashcards</h3>
+          <p>Create and study flashcards for this subject</p>
+          <Link 
+            to={`/flashcards/${subjectId}`}
+            style={{
+              backgroundColor: '#000',
+              color: 'white',
+              padding: '0.75rem 1.5rem',
+              borderRadius: '4px',
+              textDecoration: 'none',
+              marginTop: '1rem'
+            }}
+          >
+            Open Flashcards
+          </Link>
+        </div>
+
+        <div style={{
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          padding: '1.5rem',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          textAlign: 'center',
+          backgroundColor: '#ffffff'
+        }}>
+          <h3>AI Chatbot</h3>
+          <p>Ask questions and get AI-powered answers</p>
+          <Link 
+            to={`/chatbot/${subjectId}`}
+            style={{
+              backgroundColor: '#000',
+              color: 'white',
+              padding: '0.75rem 1.5rem',
+              borderRadius: '4px',
+              textDecoration: 'none',
+              marginTop: '1rem'
+            }}
+          >
+            Chat with AI
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default SubjectPage;

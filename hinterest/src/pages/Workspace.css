@@ -1,0 +1,224 @@
+/* Fade-up animation */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Float keyframes */
+@keyframes float1 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes float2 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes float3 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes float4 {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-9px); }
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes modalFloat {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+/* Layout container - UPDATED FOR DARK MODE */
+.workspace-container {
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Header - UPDATED FOR DARK MODE */
+.workspace-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background-color: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+  transition: all 0.3s ease;
+}
+
+.logo {
+  font-weight: 600;
+  font-size: 1.25rem;
+  color: var(--text-color);
+}
+
+.nav-links a {
+  margin-left: 2rem;
+  text-decoration: none;
+  color: var(--nav-text);
+  font-weight: 400;
+  transition: opacity 0.2s ease;
+}
+
+.nav-links a:hover {
+  opacity: 0.6;
+}
+
+/* Main content - UPDATED FOR DARK MODE */
+.workspace-main {
+  flex: 1;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--bg-color);
+}
+
+/* Tagline - UPDATED FOR DARK MODE */
+.tagline {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin-bottom: 2rem;
+  color: var(--text-color);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 1s ease forwards;
+  animation-delay: 0.1s;
+}
+
+/* Subject dropdown - UPDATED FOR DARK MODE */
+.subject-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.subject-dropdown select,
+.subject-dropdown button {
+  padding: 0.5rem 1rem;
+  font-size: 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  background-color: var(--tool-bg);
+  color: var(--tool-text);
+  transition: all 0.3s ease;
+}
+
+/* Modal - UPDATED FOR DARK MODE */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal {
+  background-color: var(--tool-bg);
+  color: var(--tool-text);
+  padding: 2rem;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: modalFadeIn 0.8s ease forwards, modalFloat 4s ease-in-out infinite;
+  animation-delay: 0s, 0.8s;
+  border: 1px solid var(--border-color);
+}
+
+/* Grid layout - UPDATED FOR DARK MODE */
+.tools-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin-top: 2.5rem;
+  animation: fadeUp 1s ease-out both;
+}
+
+.tool-button {
+  display: inline-block;
+  padding: 1rem 2rem;
+  font-size: 1.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--tool-bg);
+  color: var(--tool-text);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+  min-width: auto;
+  width: fit-content;
+  border: 1px solid var(--border-color);
+}
+
+.tool-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  background-color: var(--tool-hover);
+}
+
+/* Individual tool animations */
+.tool-button:nth-child(1) {
+  animation: fadeUp 0.8s ease forwards, float1 3.5s ease-in-out infinite;
+  animation-delay: 0.2s, 0s;
+}
+.tool-button:nth-child(2) {
+  animation: fadeUp 0.8s ease forwards, float2 4s ease-in-out infinite;
+  animation-delay: 0.4s, 0s;
+}
+.tool-button:nth-child(3) {
+  animation: fadeUp 0.8s ease forwards, float3 4.2s ease-in-out infinite;
+  animation-delay: 0.6s, 0s;
+}
+.tool-button:nth-child(4) {
+  animation: fadeUp 0.8s ease forwards, float4 3.8s ease-in-out infinite;
+  animation-delay: 0.8s, 0s;
+}
+
+/* Add this new variable to your light/dark classes in index.css */
+/* Should be added to both .light and .dark classes */
+/* .light {
+  --tool-hover: #f8f9fa;
+}
+.dark {
+  --tool-hover: #3d3d3d;
+} */

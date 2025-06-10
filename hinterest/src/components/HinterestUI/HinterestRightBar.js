@@ -1,23 +1,10 @@
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
 
 export default function HinterestRightBar() {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  
-  useEffect(() => {
-    // Check authentication status
-    const authStatus = sessionStorage.getItem('isLoggedIn') || localStorage.getItem('isLoggedIn');
-    setIsLoggedIn(!!authStatus);
-  }, []);
   
   const handleFlashcardsClick = () => {
-    if (isLoggedIn) {
-      navigate('/flashcards');
-    } else {
-      alert('Please login to access flashcards');
-      navigate('/');
-    }
+    navigate('/flashcards');
   };
   
   return (

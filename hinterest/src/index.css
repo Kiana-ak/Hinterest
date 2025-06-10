@@ -1,13 +1,70 @@
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: 'Poppins', sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root, .App, * {
+  font-family: 'Poppins', sans-serif !important;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+body.light {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.dark {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+/* Light theme (default) */
+.light {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --header-bg: #f8f9fa;
+   --tool-bg: #ffffff;
+  --tool-text: #000000;
+  --nav-text: #333333;
+  --border-color: #e0e0e0;
+}
+
+/* Dark theme */
+.dark {
+  --bg-color: #121212;
+  --text-color: #ffffff;
+  --header-bg: #1a1a1a;
+   --tool-bg: #2d2d2d;
+  --tool-text: #ffffff;
+  --nav-text: #f0f0f0;
+  --border-color: #444444;
+}
+
+/* Apply these variables to your elements */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: all 0.3s ease;
+}
+
+.header {
+  background-color: var(--header-bg);
+}
+
+/* Optional enhancements */
+a {
+  transition: color 0.3s;
+}
+body.dark a {
+  color: #90caf9; /* Light blue for dark mode links */
+}
+body.light a {
+  color: #007BFF; /* Normal link color */
 }
